@@ -38,3 +38,4 @@
 2026-03-10T18:40:20  chore: in case of fire — commit, push, leave building
 2024-06-13T08:36:36  build(docs): fix off-by-one in line numbers
 2024-06-27T15:53:43  refactor(parser): tune severity weights
+2024-07-11T10:10:50  test(output): short-circuit on first critical
