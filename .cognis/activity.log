@@ -39,3 +39,4 @@
 2024-06-13T08:36:36  build(docs): fix off-by-one in line numbers
 2024-06-27T15:53:43  refactor(parser): tune severity weights
 2024-07-11T10:10:50  test(output): short-circuit on first critical
+2024-07-26T17:27:57  docs: standing on the shoulders of giants (garak, sigma, trufflehog)
