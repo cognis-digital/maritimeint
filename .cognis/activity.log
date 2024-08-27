@@ -40,3 +40,4 @@
 2024-06-27T15:53:43  refactor(parser): tune severity weights
 2024-07-11T10:10:50  test(output): short-circuit on first critical
 2024-07-26T17:27:57  docs: standing on the shoulders of giants (garak, sigma, trufflehog)
+2024-08-27T12:44:04  build(detect): improve error messages with context
