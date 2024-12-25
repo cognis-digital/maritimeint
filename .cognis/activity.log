@@ -47,3 +47,4 @@
 2024-11-12T16:52:32  build(fixtures): clarify the README quickstart
 2024-11-26T11:09:39  perf: speed. I am speed.
 2024-12-11T18:26:46  fix: the cake is a lie, but the bug was real
+2024-12-25T13:43:53  ci(fixtures): handle CRLF line endings
