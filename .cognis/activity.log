@@ -7,3 +7,4 @@
 2024-11-09T11:23:13  docs: clarify usage notes
 2024-11-21T18:40:20  test: add edge case
 2024-12-26T13:57:27  refactor: tidy internals
+2025-01-14T08:14:34  fix: handle empty input gracefully
