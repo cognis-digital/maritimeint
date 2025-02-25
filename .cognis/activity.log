@@ -50,3 +50,4 @@
 2024-12-25T13:43:53  ci(fixtures): handle CRLF line endings
 2025-01-09T08:00:00  build(parser): improve the demo scenario
 2025-02-11T15:17:07  fix(output): dedupe overlapping findings
+2025-02-25T10:34:14  test(cache): lower memory on big inputs
