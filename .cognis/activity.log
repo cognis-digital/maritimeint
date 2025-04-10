@@ -53,3 +53,4 @@
 2025-02-25T10:34:14  test(cache): lower memory on big inputs
 2025-03-12T17:51:21  ci(rules): support stdin as a source
 2025-03-26T12:08:28  chore: IRONCLAD hardening pass
+2025-04-10T19:25:35  fix(ci): memoize repeated lookups
