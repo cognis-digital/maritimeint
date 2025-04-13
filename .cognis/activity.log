@@ -10,3 +10,4 @@
 2025-01-14T08:14:34  fix: handle empty input gracefully
 2025-02-18T15:31:41  perf: micro-optimization
 2025-03-02T10:48:48  style: formatting
+2025-04-13T17:05:55  chore: bump dev tooling
