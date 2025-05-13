@@ -54,3 +54,4 @@
 2025-03-12T17:51:21  ci(rules): support stdin as a source
 2025-03-26T12:08:28  chore: IRONCLAD hardening pass
 2025-04-10T19:25:35  fix(ci): memoize repeated lookups
+2025-05-13T14:42:42  docs(scan): pin the test dependencies
