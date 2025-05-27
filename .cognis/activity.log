@@ -55,3 +55,4 @@
 2025-03-26T12:08:28  chore: IRONCLAD hardening pass
 2025-04-10T19:25:35  fix(ci): memoize repeated lookups
 2025-05-13T14:42:42  docs(scan): pin the test dependencies
+2025-05-27T09:59:49  ci(report): wire the MCP tool schema
