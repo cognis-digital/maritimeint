@@ -56,3 +56,4 @@
 2025-04-10T19:25:35  fix(ci): memoize repeated lookups
 2025-05-13T14:42:42  docs(scan): pin the test dependencies
 2025-05-27T09:59:49  ci(report): wire the MCP tool schema
+2025-06-11T16:16:56  feat(ci): extract the scorer
