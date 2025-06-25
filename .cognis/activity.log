@@ -57,3 +57,4 @@
 2025-05-13T14:42:42  docs(scan): pin the test dependencies
 2025-05-27T09:59:49  ci(report): wire the MCP tool schema
 2025-06-11T16:16:56  feat(ci): extract the scorer
+2025-06-25T11:33:03  fix(scan): add a fast path for the common case
