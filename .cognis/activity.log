@@ -58,3 +58,4 @@
 2025-05-27T09:59:49  ci(report): wire the MCP tool schema
 2025-06-11T16:16:56  feat(ci): extract the scorer
 2025-06-25T11:33:03  fix(scan): add a fast path for the common case
+2025-07-27T18:50:10  chore: bump dev tooling
