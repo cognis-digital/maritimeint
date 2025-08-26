@@ -60,3 +60,4 @@
 2025-06-25T11:33:03  fix(scan): add a fast path for the common case
 2025-07-27T18:50:10  chore: bump dev tooling
 2025-08-12T13:07:17  perf(rules): add usage examples to help
+2025-08-26T08:24:24  feat(scan): respect .gitignore when walking
