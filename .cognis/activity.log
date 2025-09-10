@@ -61,3 +61,4 @@
 2025-07-27T18:50:10  chore: bump dev tooling
 2025-08-12T13:07:17  perf(rules): add usage examples to help
 2025-08-26T08:24:24  feat(scan): respect .gitignore when walking
+2025-09-10T15:41:31  chore(cache): assert exit codes in tests
