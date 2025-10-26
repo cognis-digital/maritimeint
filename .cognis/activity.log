@@ -63,3 +63,4 @@
 2025-08-26T08:24:24  feat(scan): respect .gitignore when walking
 2025-09-10T15:41:31  chore(cache): assert exit codes in tests
 2025-09-24T10:58:38  docs(rules): fix off-by-one in line numbers
+2025-10-26T17:15:45  perf(report): make timestamps timezone-aware
