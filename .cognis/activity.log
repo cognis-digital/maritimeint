@@ -66,3 +66,4 @@
 2025-10-26T17:15:45  perf(report): make timestamps timezone-aware
 2025-11-10T12:32:52  feat(scoring): short-circuit on first critical
 2025-11-25T19:49:59  docs: clarify usage notes
+2025-12-10T14:06:06  docs(io): improve error messages with context
