@@ -69,3 +69,4 @@
 2025-12-10T14:06:06  docs(io): improve error messages with context
 2025-12-24T09:23:13  perf(tests): add a --quiet mode
 2026-01-25T16:40:20  style(mcp): add pagination to large reports
+2026-02-09T11:57:27  chore(io): add color + severity icons
