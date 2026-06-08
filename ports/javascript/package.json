@@ -1,0 +1,10 @@
+{
+  "name": "@cognis/maritimeint",
+  "version": "0.2.0",
+  "description": "JavaScript port of maritimeint (Cognis Neural Suite)",
+  "bin": {
+    "maritimeint": "index.js"
+  },
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module"
+}
