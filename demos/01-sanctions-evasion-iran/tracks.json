@@ -1,0 +1,19 @@
+[
+  {
+    "mmsi": "572468210",
+    "name": "PHANTOM EAGLE",
+    "ais_gap_hours": "34",
+    "flag_changed_within_voyage": true,
+    "previous_flag": "PA",
+    "current_flag": "TZ",
+    "loiter_zone": "Persian Gulf"
+  },
+  {
+    "mmsi": "572468211",
+    "name": "NIGHT VOYAGER",
+    "ais_gap_hours": "22",
+    "flag_changed_within_voyage": true,
+    "previous_flag": "PA",
+    "current_flag": "GA"
+  }
+]

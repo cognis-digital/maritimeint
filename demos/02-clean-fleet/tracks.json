@@ -1,0 +1,14 @@
+[
+  {
+    "mmsi": "123456789",
+    "ais_gap_hours": "0",
+    "flag_changed_within_voyage": false,
+    "name": "MAERSK ESSEX"
+  },
+  {
+    "mmsi": "123456790",
+    "ais_gap_hours": "1",
+    "flag_changed_within_voyage": false,
+    "name": "MSC BRIDGE"
+  }
+]

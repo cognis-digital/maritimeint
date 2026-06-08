@@ -1,0 +1,12 @@
+[
+  {
+    "mmsi": "123456789",
+    "ais_gap_hours": "8",
+    "flag_changed_within_voyage": true
+  },
+  {
+    "mmsi": "987654321",
+    "ais_gap_hours": "0",
+    "flag_changed_within_voyage": false
+  }
+]

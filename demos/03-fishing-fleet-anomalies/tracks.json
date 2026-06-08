@@ -1,0 +1,16 @@
+[
+  {
+    "mmsi": "441000123",
+    "ais_gap_hours": "8",
+    "flag_changed_within_voyage": false,
+    "name": "DEEP STAR 7",
+    "type": "fishing"
+  },
+  {
+    "mmsi": "441000124",
+    "ais_gap_hours": "12",
+    "flag_changed_within_voyage": false,
+    "name": "DEEP STAR 9",
+    "type": "fishing"
+  }
+]
