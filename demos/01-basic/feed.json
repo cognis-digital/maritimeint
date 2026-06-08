@@ -1,0 +1,16 @@
+{
+  "messages": [
+    {"mmsi": "477123456", "name": "HORIZON STAR", "timestamp": "2026-01-04T00:00:00Z", "lat": 10.5000, "lon": 114.0000, "sog": 12.0},
+    {"mmsi": "477123456", "name": "HORIZON STAR", "timestamp": "2026-01-04T02:00:00Z", "lat": 10.7000, "lon": 114.3000, "sog": 11.5},
+    {"mmsi": "477123456", "name": "HORIZON STAR", "timestamp": "2026-01-04T12:30:00Z", "lat": 11.0000, "lon": 114.8000, "sog": 1.0},
+    {"mmsi": "477123456", "name": "HORIZON STAR", "timestamp": "2026-01-04T14:30:00Z", "lat": 11.0050, "lon": 114.8030, "sog": 0.2},
+    {"mmsi": "477123456", "name": "HORIZON STAR", "timestamp": "2026-01-04T17:00:00Z", "lat": 11.0080, "lon": 114.8010, "sog": 0.1},
+
+    {"mmsi": "352987654", "name": "BLUE PEARL", "timestamp": "2026-01-04T13:00:00Z", "lat": 11.0040, "lon": 114.8020, "sog": 0.5},
+    {"mmsi": "352987654", "name": "BLUE PEARL", "timestamp": "2026-01-04T14:30:00Z", "lat": 11.0055, "lon": 114.8035, "sog": 0.2},
+    {"mmsi": "352987654", "name": "BLUE PEARL", "timestamp": "2026-01-04T17:30:00Z", "lat": 11.0070, "lon": 114.8000, "sog": 0.3},
+
+    {"mmsi": "636099887", "name": "CLONE", "timestamp": "2026-01-04T08:00:00Z", "lat": 1.2000, "lon": 103.8000, "sog": 14.0},
+    {"mmsi": "636099887", "name": "GHOST", "timestamp": "2026-01-04T08:30:00Z", "lat": 36.0000, "lon": 120.0000, "sog": 14.0}
+  ]
+}
