@@ -36,7 +36,14 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 <a name="features"></a>
 ## Features
 
-- ✅ Scan
+- ✅ Parse Messages
+- ✅ Load Messages
+- ✅ Haversine Nm
+- ✅ Detect Gaps
+- ✅ Detect Speed Jumps
+- ✅ Detect Loitering
+- ✅ Detect Spoofing
+- ✅ Detect Rendezvous
 - ✅ Runs on Linux/macOS/Windows · Docker · devcontainer
 - ✅ Ports in Python, JavaScript, Go, and Rust (`ports/`)
 
