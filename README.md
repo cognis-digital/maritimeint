@@ -16,7 +16,7 @@
 </div>
 
 ```bash
-pip install cognis-maritimeint
+pip install "git+https://github.com/cognis-digital/maritimeint.git"
 maritimeint scan .            # → prioritized findings in seconds
 ```
 
@@ -53,7 +53,7 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 ## Quick start
 
 ```bash
-pip install cognis-maritimeint
+pip install "git+https://github.com/cognis-digital/maritimeint.git"
 maritimeint --version
 maritimeint scan .                       # scan current project
 maritimeint scan . --format json         # machine-readable
