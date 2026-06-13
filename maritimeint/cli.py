@@ -17,11 +17,24 @@ from .core import (
     detect_rendezvous,
     analyze,
 )
+from .locate import locate
+from .sanctions import load_sanctions
 
 
 def _emit(obj: Any, fmt: str) -> None:
     if fmt == "json":
         print(json.dumps(obj, indent=2))
+        return
+    if isinstance(obj, dict) and "watchlist" in obj:
+        wl = obj["watchlist"]
+        print(f"MARITIMEINT watchlist ({len(wl)} vessels, highest risk first):")
+        for v in wl:
+            flag = " [SANCTIONED]" if v["sanctioned"] else ""
+            print(f"  [{v['tier']:<6}] {v['mmsi']} {v['name']}{flag}  score={v['score']}")
+            for r in v["reasons"]:
+                print(f"        - {r}")
+        if obj.get("ai_assessment"):
+            print("\nAI assessment (reasoning add-in):\n" + obj["ai_assessment"])
         return
     # table
     if isinstance(obj, dict) and "findings" in obj:
@@ -82,16 +95,57 @@ def build_parser() -> argparse.ArgumentParser:
     _add_input(r)
     r.add_argument("--proximity-nm", type=float, default=0.5)
     r.add_argument("--min-minutes", type=float, default=30.0)
+
+    lo = sub.add_parser("locate", help="prioritized + explained grey-fleet watchlist")
+    _add_input(lo)
+    lo.add_argument("--sanctions", default=None, help="sanctions list JSON to cross-reference")
+    lo.add_argument("--ai", action="store_true",
+                    help="augment with the reasoning add-in if a model backend is reachable")
+
+    sub.add_parser("menu", help="interactive multi-level menu")
+    sub.add_parser("addins", help="show available AI add-ins (VL + reasoning) and their backends")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    if args.command == "menu":  # pragma: no cover - interactive
+        from .menu import run as menu_run
+        return menu_run()
+    if args.command == "addins":
+        from .addins import available
+        rows = available()
+        if args.format == "json":
+            print(json.dumps(rows, indent=2))
+        else:
+            print("AI add-ins (stack onto the stdlib detection core):")
+            for a in rows:
+                st = f"ENABLED via {a['backend']}" if a["enabled"] else "disabled (no backend reachable)"
+                print(f"  {a['addin']:<10} {st}")
+                print(f"             {a['capability']}")
+        return 0
+
     try:
         msgs = load_messages(args.input)
         if args.command == "analyze":
             result: Any = analyze(msgs)
+        elif args.command == "locate":
+            sanctions = load_sanctions(args.sanctions) if args.sanctions else None
+            static = {m.mmsi: {"name": m.name} for m in msgs}
+            result = locate(msgs, sanctions=sanctions, static=static)
+            if args.ai:
+                from .addins import available, reasoning_assess
+                a = next((x for x in available() if x["addin"] == "reasoning" and x["enabled"]), None)
+                if a:
+                    try:
+                        result["ai_assessment"] = reasoning_assess(
+                            result["watchlist"], a["base_url"], (a["models"] or ["default"])[0])
+                    except Exception as exc:
+                        result["ai_assessment"] = f"(reasoning add-in error: {exc})"
+                else:
+                    result["ai_assessment"] = "(no reasoning backend reachable; core watchlist only)"
         elif args.command == "gaps":
             result = detect_gaps(msgs, gap_hours=args.gap_hours)
         elif args.command == "jumps":

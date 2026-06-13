@@ -43,9 +43,31 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 - ✅ Detect Speed Jumps
 - ✅ Detect Loitering
 - ✅ Detect Spoofing
-- ✅ Detect Rendezvous
+- ✅ Detect Rendezvous (ship-to-ship transfer signature)
+- ✅ **LocateAnything watchlist** — one call → prioritized, *explained* grey-fleet watchlist (HIGH/MEDIUM/LOW + plain-language reasons)
+- ✅ **Sanctions cross-reference** — match tracked vessels to an OFAC/EU/OFSI-style list by MMSI / IMO / name
+- ✅ **Composable AI add-ins** — optional vision (imagery triage) + reasoning (narrative assessment) that *stack* onto the stdlib core, via the Cognis fleet / **edgemesh**; hardware/availability-gated (off if no backend)
+- ✅ **Multi-level interactive menu** (`maritimeint menu`)
 - ✅ Runs on Linux/macOS/Windows · Docker · devcontainer
 - ✅ Ports in Python, JavaScript, Go, and Rust (`ports/`)
+
+## Grey-fleet watchlist + AI add-ins
+
+```bash
+maritimeint locate demos/ais_sample.json --sanctions demos/sanctions_sample.json
+#  [HIGH ] 210111000 NEPTUNE STAR [SANCTIONED]  score=12
+#        - ON SANCTIONS LIST (...)   - AIS gap 9h (going dark)
+#        - rendezvous 90min, 0.008nm (possible ship-to-ship transfer)
+maritimeint addins                 # which AI add-ins are reachable right now
+maritimeint locate <ais.json> --ai # augment with the reasoning model if a backend is up
+maritimeint menu                   # interactive, multi-level
+```
+
+The detection core is **pure stdlib and always works**. Add-ins *stack* extra
+capability when a model backend is reachable — point them at an **edgemesh** gateway
+(which unifies `uncensored-fleet`, `cognis-code`, and a vision/VL backend behind one
+`/v1`), or at those fleet endpoints directly. If nothing's up, add-ins stay off and the
+core watchlist still runs. Detection/situational-awareness only — see the disclaimer.
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
@@ -55,9 +77,10 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 ```bash
 pip install cognis-maritimeint
 maritimeint --version
-maritimeint scan .                       # scan current project
-maritimeint scan . --format json         # machine-readable
-maritimeint scan . --fail-on high        # CI gate (non-zero exit)
+maritimeint analyze demos/ais_sample.json            # full detector suite + risk ranking
+maritimeint locate demos/ais_sample.json             # prioritized, explained watchlist
+maritimeint locate demos/ais_sample.json --format json   # machine-readable
+maritimeint menu                                     # interactive multi-level menu
 ```
 
 <div align="right"><a href="#top">↑ back to top</a></div>

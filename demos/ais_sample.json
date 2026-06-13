@@ -1,0 +1,16 @@
+[
+  {"mmsi": "210111000", "name": "NEPTUNE STAR", "timestamp": "2026-02-01T00:00:00Z", "lat": 36.4000, "lon": 22.9500, "sog": 12.0, "cog": 95},
+  {"mmsi": "210111000", "name": "NEPTUNE STAR", "timestamp": "2026-02-01T09:00:00Z", "lat": 36.4200, "lon": 22.9600, "sog": 1.0, "cog": 95},
+  {"mmsi": "210111000", "name": "NEPTUNE STAR", "timestamp": "2026-02-01T09:30:00Z", "lat": 36.4205, "lon": 22.9605, "sog": 0.2, "cog": 0},
+  {"mmsi": "210111000", "name": "NEPTUNE STAR", "timestamp": "2026-02-01T10:30:00Z", "lat": 36.4206, "lon": 22.9606, "sog": 0.1, "cog": 0},
+
+  {"mmsi": "210222000", "name": "QUIET DAWN", "timestamp": "2026-02-01T09:25:00Z", "lat": 36.4204, "lon": 22.9604, "sog": 0.3, "cog": 10},
+  {"mmsi": "210222000", "name": "QUIET DAWN", "timestamp": "2026-02-01T10:25:00Z", "lat": 36.4205, "lon": 22.9607, "sog": 0.2, "cog": 10},
+
+  {"mmsi": "311333000", "name": "BLUE HORIZON", "timestamp": "2026-02-01T00:00:00Z", "lat": 35.0000, "lon": 20.0000, "sog": 14.0, "cog": 270},
+  {"mmsi": "311333000", "name": "BLUE HORIZON", "timestamp": "2026-02-01T01:00:00Z", "lat": 35.0100, "lon": 19.7000, "sog": 14.2, "cog": 270},
+  {"mmsi": "311333000", "name": "BLUE HORIZON", "timestamp": "2026-02-01T02:00:00Z", "lat": 35.0200, "lon": 19.4000, "sog": 14.1, "cog": 270},
+
+  {"mmsi": "210444000", "name": "GHOST RUNNER", "timestamp": "2026-02-01T00:00:00Z", "lat": 36.0000, "lon": 22.0000, "sog": 11.0, "cog": 45},
+  {"mmsi": "210444000", "name": "GHOST RUNNER", "timestamp": "2026-02-01T00:10:00Z", "lat": 37.0000, "lon": 23.0000, "sog": 11.0, "cog": 45}
+]

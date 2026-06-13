@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cognis-maritimeint"
-version = "0.1.0"
+version = "0.2.0"
 description = "AIS vessel tracking & sanctions-evasion anomaly detection"
 authors = [{name = "Cognis Digital", email = "suite@cognis.digital"}]
 license = {text = "LicenseRef-COCL-1.0"}
