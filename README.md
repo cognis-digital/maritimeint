@@ -226,3 +226,5 @@ Source-available under the **Cognis Open Collaboration License (COCL) v1.0** —
 
 ---
 📡 **[Interop map](INTEROP.md)** — how this repo composes with the rest of the Cognis suite (private-AI backbone, agent language + cognition, domain intelligence).
+
+📚 **[Sources & data](SOURCES.md)** — the real authoritative maritime-domain sources (OFAC SDN, AIS feeds, Sentinel-1, Equasis, C4ADS, CSIS/RUSI) behind the detectors, risk model, and sanctions screening.
