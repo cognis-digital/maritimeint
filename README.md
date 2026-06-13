@@ -17,7 +17,7 @@
 
 ```bash
 pip install cognis-maritimeint
-maritimeint scan .            # → prioritized findings in seconds
+maritimeint locate demos/ais_sample.json   # → prioritized grey-fleet watchlist in seconds
 ```
 
 ## Contents
@@ -99,11 +99,14 @@ local ports. No backend? The stdlib detection core still runs; AI add-ins just s
 ## Example
 
 ```text
-$ maritimeint scan .
-  [HIGH    ] MAR-001  example finding             (./src/app.py)
-  [MEDIUM  ] MAR-002  another signal              (./config.yaml)
-
-  2 findings · risk score 5 · 38ms
+$ maritimeint locate demos/ais_sample.json --sanctions demos/sanctions_sample.json
+MARITIMEINT watchlist (3 vessels, highest risk first):
+  [HIGH  ] 210111000 NEPTUNE STAR [SANCTIONED]  score=12
+        - ON SANCTIONS LIST (SAMPLE-EO14024)
+        - AIS gap 9.0h (going dark)
+        - rendezvous 90.0min, min 0.008nm (possible ship-to-ship transfer)
+  [MEDIUM] 210444000 GHOST RUNNER  score=3
+        - implausible 462.2kn position jump (possible spoofing)
 ```
 
 <div align="right"><a href="#top">↑ back to top</a></div>
@@ -129,7 +132,7 @@ flowchart LR
 `maritimeint` is interoperable with every popular way of using AI:
 
 - **MCP server** — `maritimeint mcp` (Claude Desktop, Cursor, Cognis.Studio, [uncensored-fleet](https://github.com/cognis-digital/uncensored-fleet))
-- **OpenAI-compatible / JSON** — pipe `maritimeint scan . --format json` into any agent or LLM
+- **OpenAI-compatible / JSON** — pipe `maritimeint --format json locate <ais.json>` into any agent or LLM
 - **LangChain · CrewAI · AutoGen · LlamaIndex** — wrap the CLI/JSON as a tool in one line
 - **CI / scripts** — exit codes + SARIF for non-AI pipelines
 
