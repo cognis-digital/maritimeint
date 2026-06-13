@@ -20,6 +20,12 @@ pip install "git+https://github.com/cognis-digital/maritimeint.git"
 maritimeint scan .            # → prioritized findings in seconds
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+MARITIMEINT watches ship-tracking data (AIS broadcasts) and automatically spots suspicious behavior — like a vessel going dark in a sensitive area, two ships meeting in the middle of the ocean to secretly transfer cargo, or a ship claiming to be in two places at once. It runs entirely on your own computer with no account or subscription required. Designed for journalists, researchers, and analysts who investigate sanctions evasion, smuggling, or fleet anomalies but don't want to fight complicated infrastructure to do it.
+<!-- cognis:layman:end -->
+
 ## Contents
 
 - [Why maritimeint?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
@@ -50,6 +56,42 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`maritimeint` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/maritimeint/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/maritimeint/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/maritimeint.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/maritimeint.git"  # uv
+pip install "git+https://github.com/cognis-digital/maritimeint.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/maritimeint.git
+cd maritimeint && pip install .
+```
+
+Then run:
+```sh
+maritimeint --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash
