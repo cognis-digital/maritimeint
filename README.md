@@ -61,6 +61,10 @@ maritimeint locate demos/ais_sample.json --sanctions demos/sanctions_sample.json
 maritimeint addins                 # which AI add-ins are reachable right now
 maritimeint locate <ais.json> --ai # augment with the reasoning model if a backend is up
 maritimeint menu                   # interactive, multi-level
+
+# point the add-ins at a LIVE edgemesh gateway (or any OpenAI-compatible /v1):
+maritimeint locate <ais.json> --endpoint http://<edgemesh-host>:8780 --model <id>
+maritimeint vision https://.../sentinel1_scene.png --endpoint http://<edgemesh-host>:8780 --model <vl-model>
 ```
 
 The detection core is **pure stdlib and always works**. Add-ins *stack* extra

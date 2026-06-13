@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0] — 2026-06-13
+### Added
+- **Live-endpoint add-ins**: `locate --endpoint <url> --model <id>` and a new
+  `vision <image> --endpoint <url>` command point the reasoning/vision add-ins at any
+  OpenAI-compatible `/v1` — a **live edgemesh gateway** (which unifies the Cognis fleet)
+  or a fleet backend directly. Discovery still auto-finds local backends when no
+  `--endpoint` is given.
+- **`vision` command** — triage maritime imagery (e.g. a Sentinel-1/optical scene) for
+  vessel presence/characteristics via a VL model. Descriptive situational-awareness only.
+- End-to-end integration tests against a live mock `/v1` server proving the reasoning +
+  vision wiring (and graceful failure when no backend) — 21 tests total.
+
 ## [0.2.0] — 2026-06-13
 
 The "LocateAnything + AI add-ins" release — from a detector suite to a usable

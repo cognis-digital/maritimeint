@@ -101,6 +101,15 @@ def build_parser() -> argparse.ArgumentParser:
     lo.add_argument("--sanctions", default=None, help="sanctions list JSON to cross-reference")
     lo.add_argument("--ai", action="store_true",
                     help="augment with the reasoning add-in if a model backend is reachable")
+    lo.add_argument("--endpoint", default=None,
+                    help="OpenAI-compatible base URL for add-ins (e.g. a live edgemesh gateway)")
+    lo.add_argument("--model", default=None, help="model id for the add-in")
+
+    vi = sub.add_parser("vision", help="triage maritime imagery for vessel presence (VL add-in)")
+    vi.add_argument("image", help="image URL or data URI (e.g. a Sentinel-1/optical scene)")
+    vi.add_argument("--endpoint", default=None, help="OpenAI-compatible VL base URL (live edgemesh gateway)")
+    vi.add_argument("--model", default=None)
+    vi.add_argument("--note", default="", help="optional context for the triage")
 
     sub.add_parser("menu", help="interactive multi-level menu")
     sub.add_parser("addins", help="show available AI add-ins (VL + reasoning) and their backends")
@@ -126,6 +135,23 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  {a['addin']:<10} {st}")
                 print(f"             {a['capability']}")
         return 0
+    if args.command == "vision":
+        from .addins import available, vision_assess
+        if args.endpoint:
+            base, model = args.endpoint, (args.model or "default")
+        else:
+            a = next((x for x in available() if x["addin"] == "vision" and x["enabled"]), None)
+            if not a:
+                print("no vision backend reachable; start a VL backend (e.g. vision-fleet) "
+                      "or pass --endpoint <edgemesh /v1 base>", file=sys.stderr)
+                return 1
+            base, model = a["base_url"], (args.model or (a["models"] or ["default"])[0])
+        try:
+            print(vision_assess(args.image, base, model, note=args.note))
+        except Exception as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        return 0
 
     try:
         msgs = load_messages(args.input)
@@ -135,13 +161,16 @@ def main(argv: list[str] | None = None) -> int:
             sanctions = load_sanctions(args.sanctions) if args.sanctions else None
             static = {m.mmsi: {"name": m.name} for m in msgs}
             result = locate(msgs, sanctions=sanctions, static=static)
-            if args.ai:
+            if args.ai or args.endpoint:
                 from .addins import available, reasoning_assess
-                a = next((x for x in available() if x["addin"] == "reasoning" and x["enabled"]), None)
-                if a:
+                if args.endpoint:
+                    base, model = args.endpoint, (args.model or "default")
+                else:
+                    a = next((x for x in available() if x["addin"] == "reasoning" and x["enabled"]), None)
+                    base, model = (a["base_url"], args.model or (a["models"] or ["default"])[0]) if a else (None, None)
+                if base:
                     try:
-                        result["ai_assessment"] = reasoning_assess(
-                            result["watchlist"], a["base_url"], (a["models"] or ["default"])[0])
+                        result["ai_assessment"] = reasoning_assess(result["watchlist"], base, model)
                     except Exception as exc:
                         result["ai_assessment"] = f"(reasoning add-in error: {exc})"
                 else:
