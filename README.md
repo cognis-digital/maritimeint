@@ -113,13 +113,12 @@ $ maritimeint scan .
 
 ```mermaid
 flowchart LR
-  A[Input: file / dir / API] --> B[Collectors]
-  B --> C[Rules / Analyzers]
-  C --> D[Scorer]
-  D --> E{Reporters}
-  E --> F[Table]
-  E --> G[JSON / SARIF]
-  E --> H[MCP tool -. drives .-> AI agents]
+  AIS[AIS tracks<br/>JSON / CSV] --> DET[detectors<br/>gaps · spoofing · loitering · rendezvous]
+  SANC[(sanctions list<br/>OFAC / EU / OFSI)] --> SC
+  DET --> SC[risk scoring<br/>tier + plain-language reasons]
+  SC --> WL[prioritized watchlist]
+  WL --> GATE{--fail-on<br/>compliance gate}
+  WL -. optional .-> AI[vision / reasoning add-ins<br/>via edgemesh / your fleet]
 ```
 
 <div align="right"><a href="#top">↑ back to top</a></div>
