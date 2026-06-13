@@ -14,6 +14,7 @@ All detectors return plain dicts/lists so output serializes cleanly to JSON.
 
 from __future__ import annotations
 
+import csv
 import json
 import math
 from dataclasses import dataclass, asdict
@@ -75,7 +76,18 @@ def parse_messages(data: Iterable[dict[str, Any]]) -> list[AISMessage]:
 
 
 def load_messages(path: str) -> list[AISMessage]:
-    """Load AIS records from a JSON file (list, or {\"messages\": [...]})."""
+    """Load AIS records from JSON (list / {"messages": [...]}) or CSV.
+
+    CSV is the common real-world format from AIS providers; a header row with
+    mmsi/timestamp/lat/lon (and optional name/sog/cog/imo) is expected. Empty cells
+    are treated as absent so optional fields don't choke.
+    """
+    if path.lower().endswith(".csv"):
+        with open(path, "r", encoding="utf-8", newline="") as fh:
+            rows = []
+            for row in csv.DictReader(fh):
+                rows.append({k: v for k, v in row.items() if v not in ("", None)})
+        return parse_messages(rows)
     with open(path, "r", encoding="utf-8") as fh:
         raw = json.load(fh)
     if isinstance(raw, dict):

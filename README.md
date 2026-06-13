@@ -83,9 +83,15 @@ pip install cognis-maritimeint
 maritimeint --version
 maritimeint analyze demos/ais_sample.json            # full detector suite + risk ranking
 maritimeint locate demos/ais_sample.json             # prioritized, explained watchlist
-maritimeint locate demos/ais_sample.json --format json   # machine-readable
+maritimeint locate demos/ais_sample.csv              # CSV in too (real AIS-provider exports)
+maritimeint --format json locate demos/ais_sample.json   # machine-readable
+maritimeint locate fleet.csv --sanctions ofac.json --fail-on high   # compliance/CI gate (exit≠0)
 maritimeint menu                                     # interactive multi-level menu
 ```
+
+**Works with whatever model backend you run** — set `MARITIMEINT_ENDPOINT` (or
+`OPENAI_BASE_URL`) to your fleet/gateway, or let it auto-discover one on the common
+local ports. No backend? The stdlib detection core still runs; AI add-ins just stay off.
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 

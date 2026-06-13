@@ -7,5 +7,5 @@ try:
     from maritimeint.core import TOOL_NAME, TOOL_VERSION
 except Exception:  # pragma: no cover
     TOOL_NAME = "maritimeint"
-    TOOL_VERSION = "0.3.0"
+    TOOL_VERSION = "0.4.0"
 __version__ = TOOL_VERSION

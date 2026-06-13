@@ -104,6 +104,8 @@ def build_parser() -> argparse.ArgumentParser:
     lo.add_argument("--endpoint", default=None,
                     help="OpenAI-compatible base URL for add-ins (e.g. a live edgemesh gateway)")
     lo.add_argument("--model", default=None, help="model id for the add-in")
+    lo.add_argument("--fail-on", choices=["low", "medium", "high"], default=None,
+                    help="exit non-zero if any vessel is at/above this tier (compliance/CI gate)")
 
     vi = sub.add_parser("vision", help="triage maritime imagery for vessel presence (VL add-in)")
     vi.add_argument("image", help="image URL or data URI (e.g. a Sentinel-1/optical scene)")
@@ -194,6 +196,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     _emit(result, args.format)
+    # compliance/CI gate: non-zero exit if any vessel meets the risk threshold
+    if args.command == "locate" and getattr(args, "fail_on", None):
+        order = {"low": 1, "medium": 2, "high": 3}
+        threshold = order[args.fail_on]
+        worst = max((order.get(v["tier"].lower(), 0) for v in result["watchlist"]), default=0)
+        if worst >= threshold:
+            print(f"FAIL: a vessel meets/exceeds risk tier '{args.fail_on}'", file=sys.stderr)
+            return 2
     return 0
 
 

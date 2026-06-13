@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.4.0] — 2026-06-13
+
+The "adoption" release — works with real data and whatever backend you run, and drops
+into a compliance pipeline.
+
+### Added
+- **CSV AIS ingest** — `load_messages` now reads CSV (the common AIS-provider export
+  format), not just JSON; empty cells are treated as absent. Demo: `demos/ais_sample.csv`.
+- **`--fail-on {low,medium,high}` compliance gate** — `locate` exits non-zero if any
+  vessel meets/exceeds the tier, so it slots straight into a screening/CI pipeline.
+- **Backend works with any fleet** — `MARITIMEINT_ENDPOINT` / `OPENAI_BASE_URL` env
+  override, plus auto-discovery across the common local OpenAI-compatible ports, so a
+  local fleet *under any name* (or Ollama/vLLM/LM Studio/edgemesh/…) is found
+  automatically. Add-ins fall back to whatever backend is actually reachable.
+- Tests for CSV ingest, the fail-on gate, and any-port discovery (25 total).
+
 ## [0.3.0] — 2026-06-13
 ### Added
 - **Live-endpoint add-ins**: `locate --endpoint <url> --model <id>` and a new

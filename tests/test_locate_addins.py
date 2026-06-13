@@ -40,8 +40,10 @@ def test_addins_availability_is_gated_by_reachable_backend():
     def probe_stub(url):
         return ["qwen2.5-vl"] if "8773" in url else None
     avail = {a["addin"]: a for a in addins.available(probe_fn=probe_stub)}
+    # vision prefers the vision backend; reasoning has no preferred match but falls back
+    # to whatever IS reachable (adoption: use the fleet you actually run)
     assert avail["vision"]["enabled"] and avail["vision"]["backend"] == "vision-fleet"
-    assert not avail["reasoning"]["enabled"]   # no reasoning backend reachable
+    assert avail["reasoning"]["enabled"] and avail["reasoning"]["base_url"].endswith(":8773")
 
     # nothing reachable -> all add-ins disabled, nothing raised
     none_avail = addins.available(probe_fn=lambda url: None)
