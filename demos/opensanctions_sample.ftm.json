@@ -1,0 +1,3 @@
+{"id": "vessel-neptune", "schema": "Vessel", "caption": "NEPTUNE STAR", "properties": {"name": ["NEPTUNE STAR"], "imoNumber": ["9700001"], "mmsi": ["210111000"], "flag": ["Panama"], "program": ["RUSSIA-EO14024"]}}
+{"id": "org-acme", "schema": "Organization", "caption": "ACME HOLDINGS LLC", "properties": {"name": ["ACME HOLDINGS LLC"]}}
+{"id": "vessel-marlin", "schema": "Vessel", "caption": "GREY MARLIN", "properties": {"name": ["GREY MARLIN"], "imoNumber": ["9555123"], "flag": ["Cook Islands"], "program": ["RUSSIA-EO14024"]}}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export xmlns="http://eu.europa.ec/fpi/fsd/export">
+  <sanctionEntity logicalId="101">
+    <subjectType classificationCode="vessel" code="vessel"/>
+    <nameAlias wholeName="QUIET DAWN"/>
+    <identification identificationTypeCode="imo" number="9811000"/>
+  </sanctionEntity>
+  <sanctionEntity logicalId="102">
+    <subjectType classificationCode="vessel" code="vessel"/>
+    <nameAlias wholeName="GREY MARLIN"/>
+    <identification identificationTypeCode="imo" number="9555123"/>
+  </sanctionEntity>
+  <sanctionEntity logicalId="103">
+    <subjectType classificationCode="person" code="person"/>
+    <nameAlias wholeName="John Doe"/>
+  </sanctionEntity>
+</export>

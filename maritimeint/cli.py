@@ -120,6 +120,19 @@ def build_parser() -> argparse.ArgumentParser:
     io.add_argument("--out", default="ofac_sanctions.json", help="output sanctions JSON path")
     io.add_argument("--from-file", default=None, help="parse a local SDN.csv instead of fetching")
     io.add_argument("--url", default=None, help="override the SDN.csv URL")
+
+    isn = sub.add_parser("import-sanctions", help="import sanctioned vessels from OFAC / UK OFSI / EU / OpenSanctions (merge with 'all')")
+    isn.add_argument("--source", choices=["ofac", "ofsi", "eu", "opensanctions", "all"], default="all")
+    isn.add_argument("--from-file", default=None, help="parse a downloaded list file instead of fetching")
+    isn.add_argument("--out", default="sanctions.json")
+
+    fa = sub.add_parser("fetch-ais", help="fetch/normalize AIS positions into analyze/locate input")
+    fa.add_argument("--source", choices=["file", "aishub"], default="file")
+    fa.add_argument("--from-file", default=None, help="a provider CSV/JSON export to normalize")
+    fa.add_argument("--username", default=None, help="AISHub contributor username")
+    fa.add_argument("--out", default="ais.json")
+    fa.add_argument("--latmin", type=float, default=-90); fa.add_argument("--latmax", type=float, default=90)
+    fa.add_argument("--lonmin", type=float, default=-180); fa.add_argument("--lonmax", type=float, default=180)
     return parser
 
 
@@ -175,6 +188,54 @@ def main(argv: list[str] | None = None) -> int:
         with_imo = sum(1 for e in entries if e["imo"])
         print(f"wrote {len(entries)} sanctioned vessels ({with_imo} with IMO) to {args.out}")
         print(f"use it:  maritimeint locate <ais.json> --sanctions {args.out}")
+        return 0
+    if args.command == "import-sanctions":
+        from . import ofac, sanctions_sources as ss
+        try:
+            if args.from_file:
+                with open(args.from_file, encoding="utf-8") as fh:
+                    src = "opensanctions" if args.source == "all" else args.source
+                    entries = ss.parse(src, fh.read())
+            elif args.source == "all":
+                # merge every source with a default feed (OFAC + OpenSanctions)
+                fetched = []
+                for s in ("ofac", "opensanctions"):
+                    try:
+                        fetched.append(ss.parse(s, ss.fetch(s)))
+                    except Exception as exc:  # one feed down shouldn't kill the merge
+                        print(f"  ({s}: skipped - {exc})", file=sys.stderr)
+                entries = ss.merge(*fetched)
+            else:
+                entries = ss.parse(args.source, ss.fetch(args.source))
+        except Exception as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        ofac.write_sanctions(entries, args.out)
+        with_imo = sum(1 for e in entries if e.get("imo"))
+        print(f"wrote {len(entries)} sanctioned vessels ({with_imo} with IMO) from {args.source} to {args.out}")
+        print(f"use it:  maritimeint locate <ais.json> --sanctions {args.out}")
+        return 0
+    if args.command == "fetch-ais":
+        from . import ais_fetch as af
+        try:
+            if args.source == "file":
+                if not args.from_file:
+                    print("error: --source file needs --from-file <provider export>", file=sys.stderr)
+                    return 1
+                records = af.from_file(args.from_file)
+            else:  # aishub
+                if not args.username:
+                    print("error: --source aishub needs --username (free AISHub contributor account)", file=sys.stderr)
+                    print(af.AISSTREAM_NOTE, file=sys.stderr)
+                    return 1
+                records = af.from_aishub(args.username, latmin=args.latmin, latmax=args.latmax,
+                                         lonmin=args.lonmin, lonmax=args.lonmax)
+        except Exception as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        af.write_ais(records, args.out)
+        print(f"wrote {len(records)} AIS records to {args.out}")
+        print(f"use it:  maritimeint analyze {args.out}")
         return 0
 
     try:

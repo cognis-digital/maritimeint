@@ -67,16 +67,43 @@ maritimeint locate <ais.json> --endpoint http://<edgemesh-host>:8780 --model <id
 maritimeint vision https://.../sentinel1_scene.png --endpoint http://<edgemesh-host>:8780 --model <vl-model>
 ```
 
-### Real sanctions data (OFAC SDN importer)
+### Real sanctions data — every major list, one format
 
-Screen against actual US Treasury designations, not a sample:
+Screen against actual government designations, not a sample. Pull from any single source,
+or `--source all` to fetch + **merge** every public feed (de-duplicated by IMO → MMSI →
+name, with each vessel's source lists unioned):
 
 ```bash
-maritimeint import-ofac                                   # fetch live OFAC SDN -> ofac_sanctions.json
-maritimeint import-ofac --from-file sdn.csv               # or parse a downloaded SDN.csv (offline)
-maritimeint locate fleet.csv --sanctions ofac_sanctions.json --fail-on high
+maritimeint import-sanctions --source all --out sanctions.json     # OFAC + OpenSanctions, merged
+maritimeint import-sanctions --source opensanctions                # aggregates OFAC/EU/UK/UN
+maritimeint import-sanctions --source ofsi --from-file ConList.csv # UK OFSI (downloaded)
+maritimeint import-sanctions --source eu   --from-file eu_list.xml # EU consolidated (downloaded)
+maritimeint locate fleet.csv --sanctions sanctions.json --fail-on high
 ```
-The importer keeps the **vessel** rows from OFAC's SDN.csv and extracts each ship's IMO / MMSI / flag into the `--sanctions` format. See [SOURCES.md](SOURCES.md).
+
+| `--source` | Authority | Format | Fetch |
+|---|---|---|---|
+| `ofac` | US Treasury OFAC SDN | CSV | live URL |
+| `opensanctions` | OpenSanctions (OFAC/EU/UK/UN) | FtM JSONL | live URL |
+| `ofsi` | UK HM Treasury OFSI | CSV | `--from-file` |
+| `eu` | EU consolidated list | XML | `--from-file` |
+| `all` | OFAC + OpenSanctions, merged | — | live URLs |
+
+> `import-ofac` (OFAC-only) remains for back-compat. OFSI/EU publish at drifting / gated
+> endpoints, so those parse a list you download. See [SOURCES.md](SOURCES.md).
+
+### Live AIS in, watchlist out
+
+Normalize any AIS provider's export (or pull a live bounding box) into the detectors —
+field names are aliased automatically and unix timestamps become ISO UTC:
+
+```bash
+maritimeint fetch-ais --source file --from-file provider_export.csv --out ais.json
+maritimeint fetch-ais --source aishub --username YOU --latmin 24 --latmax 27 --lonmin 54 --lonmax 57
+maritimeint analyze ais.json                                       # then run the detectors
+```
+(aisstream.io is a websocket stream — collect `PositionReport` messages to JSON, then
+`fetch-ais --source file`.)
 
 The detection core is **pure stdlib and always works**. Add-ins *stack* extra
 capability when a model backend is reachable — point them at an **edgemesh** gateway

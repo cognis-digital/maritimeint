@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.6.0] — 2026-06-13
+
+The "every list, any feed" release — pull sanctioned-vessel designations from the four
+major public sources and normalize live AIS into the detectors, all standard-library.
+
+### Added
+- **Multi-source sanctions importer** (`maritimeint/sanctions_sources.py`) — adapters
+  for the real published formats of each major designation list, normalized into one
+  `--sanctions` shape:
+  - **OFAC** SDN.csv (via `maritimeint.ofac`)
+  - **UK OFSI** consolidated list CSV — keeps `Group Type = Ship` rows, pulls the IMO
+  - **EU** consolidated list XML — vessel subject-type entities + IMO identification
+  - **OpenSanctions** Follow-the-Money JSONL — `schema == "Vessel"` (aggregates
+    OFAC/EU/UK/UN; the most reliable single multi-source feed)
+- **`merge()`** — combines sources and de-duplicates by IMO → MMSI → normalized name,
+  *unioning* the source/program so you can see every list a vessel sits on (and an MMSI
+  from one feed fills the gap where another had only an IMO).
+- **`import-sanctions --source {ofac,ofsi,eu,opensanctions,all}`** — `all` fetches +
+  merges every feed with a public endpoint (OFAC + OpenSanctions); any source accepts
+  `--from-file` for a list you downloaded (OFSI/EU endpoints drift / gate their service).
+- **Live AIS fetcher** (`maritimeint/ais_fetch.py`) + **`fetch-ais`** — normalizes any
+  provider's CSV/JSON export (field-aliased, unix-time → ISO UTC) into analyze/locate
+  input; `--source aishub --username …` pulls a bounding box from the AISHub Web API.
+  aisstream.io websocket guidance documented inline (`AISSTREAM_NOTE`).
+- Fixtures + tests for OFSI/EU/OpenSanctions parsing, cross-source merge, and AIS
+  normalization, plus CLI round-trips that feed `locate`/`analyze` (39 total).
+
+## [0.5.0] — 2026-06-13
+
+### Added
+- **OFAC SDN importer** (`maritimeint/ofac.py`) + **`import-ofac`** — fetch the live
+  Treasury SDN.csv (or parse a local copy), keep `vessel` records, extract IMO/MMSI from
+  the remarks, and write a `--sanctions` JSON usable directly by `locate`. Offline
+  fixture `demos/ofac_sdn_sample.csv` + integration test (NEPTUNE STAR → flagged).
+
 ## [0.4.0] — 2026-06-13
 
 The "adoption" release — works with real data and whatever backend you run, and drops
