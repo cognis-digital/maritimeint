@@ -206,7 +206,7 @@ sanctions, and correlate drone-detection events — all on your own hardware.
 
 **Run it all privately** → [`edgemesh`](https://github.com/cognis-digital/edgemesh) (one OpenAI-compatible `/v1` across your whole fleet) · [`uncensored-fleet`](https://github.com/cognis-digital/uncensored-fleet)
 
-**Explore the suite →** 280+ open security & OSINT tools at [github.com/cognis-digital](https://github.com/cognis-digital) · [⭐ awesome-cognis](https://github.com/cognis-digital/awesome-cognis)
+**Explore the suite →** 300+ open security & OSINT tools at [github.com/cognis-digital](https://github.com/cognis-digital) · [⭐ awesome-cognis](https://github.com/cognis-digital/awesome-cognis)
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
