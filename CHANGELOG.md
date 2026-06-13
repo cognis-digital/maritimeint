@@ -26,6 +26,12 @@ major public sources and normalize live AIS into the detectors, all standard-lib
   aisstream.io websocket guidance documented inline (`AISSTREAM_NOTE`).
 - Fixtures + tests for OFSI/EU/OpenSanctions parsing, cross-source merge, and AIS
   normalization, plus CLI round-trips that feed `locate`/`analyze` (39 total).
+- **Interop expansion** — `INTEROP.md` gains copy-paste **tool-chaining recipes**
+  (sanctions screen → ownership/finance pivot → GEOINT → STIX/ATT&CK export →
+  cognition/agents → counter-UAS fusion) and **seven named reference stacks** across the
+  300+ suite. New **`examples/interop_demo.py`** runs a live chain offline from bundled
+  fixtures: maritimeint → humind → agentlex (`escalate/1` Horn rule) → edgemesh brief,
+  each hop degrading gracefully when a sibling repo / model backend is absent.
 
 ## [0.5.0] — 2026-06-13
 

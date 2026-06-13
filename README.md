@@ -225,6 +225,11 @@ maritimeint sits in a wider open suite of **defensive, analytical** intelligence
 Compose them: geolocate imagery, map ownership behind a flagged vessel, screen for
 sanctions, and correlate drone-detection events — all on your own hardware.
 
+> 🔗 **[INTEROP.md](INTEROP.md)** — copy-paste tool-chaining recipes (sanctions screen →
+> ownership/finance pivot → STIX/ATT&CK export → cognition/agents) + seven named
+> reference stacks. Run a live chain end-to-end (offline):
+> `python examples/interop_demo.py` — maritimeint → humind → agentlex → edgemesh brief.
+
 **Maritime & drone domain awareness**
 - [`uaslog`](https://github.com/cognis-digital/uaslog) — counter-UAS telemetry/log analyzer: flags drone-detection events, RF bands, and tracks
 - [`awesome-drone-warfare-osint`](https://github.com/cognis-digital/awesome-drone-warfare-osint) — citation-grade dataset: 8,300+ foreign components across 195+ platforms + a `query.py` compliance CLI
