@@ -67,6 +67,17 @@ maritimeint locate <ais.json> --endpoint http://<edgemesh-host>:8780 --model <id
 maritimeint vision https://.../sentinel1_scene.png --endpoint http://<edgemesh-host>:8780 --model <vl-model>
 ```
 
+### Real sanctions data (OFAC SDN importer)
+
+Screen against actual US Treasury designations, not a sample:
+
+```bash
+maritimeint import-ofac                                   # fetch live OFAC SDN -> ofac_sanctions.json
+maritimeint import-ofac --from-file sdn.csv               # or parse a downloaded SDN.csv (offline)
+maritimeint locate fleet.csv --sanctions ofac_sanctions.json --fail-on high
+```
+The importer keeps the **vessel** rows from OFAC's SDN.csv and extracts each ship's IMO / MMSI / flag into the `--sanctions` format. See [SOURCES.md](SOURCES.md).
+
 The detection core is **pure stdlib and always works**. Add-ins *stack* extra
 capability when a model backend is reachable — point them at an **edgemesh** gateway
 (which unifies `uncensored-fleet`, `cognis-code`, and a vision/VL backend behind one

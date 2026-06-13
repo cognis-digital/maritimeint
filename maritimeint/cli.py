@@ -115,6 +115,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("menu", help="interactive multi-level menu")
     sub.add_parser("addins", help="show available AI add-ins (VL + reasoning) and their backends")
+
+    io = sub.add_parser("import-ofac", help="fetch the live OFAC SDN list -> a --sanctions JSON of designated vessels")
+    io.add_argument("--out", default="ofac_sanctions.json", help="output sanctions JSON path")
+    io.add_argument("--from-file", default=None, help="parse a local SDN.csv instead of fetching")
+    io.add_argument("--url", default=None, help="override the SDN.csv URL")
     return parser
 
 
@@ -153,6 +158,23 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 1
+        return 0
+    if args.command == "import-ofac":
+        from . import ofac
+        try:
+            if args.from_file:
+                with open(args.from_file, encoding="utf-8") as fh:
+                    text = fh.read()
+            else:
+                text = ofac.fetch_sdn(args.url or ofac.SDN_CSV_URL)
+            entries = ofac.to_sanctions(text)
+            ofac.write_sanctions(entries, args.out)
+        except Exception as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        with_imo = sum(1 for e in entries if e["imo"])
+        print(f"wrote {len(entries)} sanctioned vessels ({with_imo} with IMO) to {args.out}")
+        print(f"use it:  maritimeint locate <ais.json> --sanctions {args.out}")
         return 0
 
     try:
