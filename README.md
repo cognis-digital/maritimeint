@@ -179,15 +179,34 @@ curl -fsSL https://raw.githubusercontent.com/cognis-digital/maritimeint/main/ins
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="related"></a>
-## Related Cognis tools
+## Related Cognis tools — the maritime / drone / defense-OSINT cluster
 
-- [`personagraph`](https://github.com/cognis-digital/personagraph) — Identity resolution dossier — username/email/phone cross-platform
-- [`geolens`](https://github.com/cognis-digital/geolens) — Image geolocation toolkit — EXIF, sun-shadow, OCR, reverse-search
-- [`corpmap`](https://github.com/cognis-digital/corpmap) — Corporate structure & beneficial-ownership mapper
-- [`cryptotrace`](https://github.com/cognis-digital/cryptotrace) — Free-tier blockchain investigator — ETH/BTC clustering + sanctions xref
-- [`darkmirror`](https://github.com/cognis-digital/darkmirror) — Surface-web mirror of public Tor leak-site index for brand monitoring
+maritimeint sits in a wider open suite of **defensive, analytical** intelligence tools.
+Compose them: geolocate imagery, map ownership behind a flagged vessel, screen for
+sanctions, and correlate drone-detection events — all on your own hardware.
 
-**Explore the suite →** [🗂️ all 170+ tools](https://github.com/cognis-digital/cognis-neural-suite) · [⭐ awesome-cognis](https://github.com/cognis-digital/awesome-cognis) · [🔗 cognis-sources](https://github.com/cognis-digital/cognis-sources) · [🤖 uncensored-fleet](https://github.com/cognis-digital/uncensored-fleet) · [🧠 engram](https://github.com/cognis-digital/engram)
+**Maritime & drone domain awareness**
+- [`uaslog`](https://github.com/cognis-digital/uaslog) — counter-UAS telemetry/log analyzer: flags drone-detection events, RF bands, and tracks
+- [`awesome-drone-warfare-osint`](https://github.com/cognis-digital/awesome-drone-warfare-osint) — citation-grade dataset: 8,300+ foreign components across 195+ platforms + a `query.py` compliance CLI
+- [`frontline-drones`](https://github.com/cognis-digital/frontline-drones) — descriptive catalog of frontline & commercial drones + a counter-UAS sensor selection guide
+
+**Geospatial / GEOINT**
+- [`locateanything`](https://github.com/cognis-digital/locateanything) — infer where a photo was taken using a local vision + reasoning model (OSINT geolocation)
+- [`geolens`](https://github.com/cognis-digital/geolens) — image geolocation toolkit: EXIF, sun-shadow, OCR, reverse-search
+- [`geoaoi-pro`](https://github.com/cognis-digital/geoaoi-pro) — MIL-STD-2525 / APP-6 symbology + area-of-interest helpers (QGIS-compatible)
+
+**Sanctions · ownership · finance**
+- [`corpmap`](https://github.com/cognis-digital/corpmap) — corporate structure & beneficial-ownership mapper (who really owns that hull)
+- [`cryptotrace`](https://github.com/cognis-digital/cryptotrace) — blockchain investigator: ETH/BTC clustering + sanctions cross-reference
+
+**Threat intel · identity**
+- [`personagraph`](https://github.com/cognis-digital/personagraph) — identity-resolution dossier (username/email/phone, cross-platform)
+- [`stixgen`](https://github.com/cognis-digital/stixgen) · [`iocextract`](https://github.com/cognis-digital/iocextract) · [`attackmap`](https://github.com/cognis-digital/attackmap) · [`ttphunt`](https://github.com/cognis-digital/ttphunt) — IOC → STIX, ATT&CK mapping & hunting
+- [`darkmirror`](https://github.com/cognis-digital/darkmirror) — public leak-site index mirror for brand/exposure monitoring
+
+**Run it all privately** → [`edgemesh`](https://github.com/cognis-digital/edgemesh) (one OpenAI-compatible `/v1` across your whole fleet) · [`uncensored-fleet`](https://github.com/cognis-digital/uncensored-fleet)
+
+**Explore the suite →** 280+ open security & OSINT tools at [github.com/cognis-digital](https://github.com/cognis-digital) · [⭐ awesome-cognis](https://github.com/cognis-digital/awesome-cognis)
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
