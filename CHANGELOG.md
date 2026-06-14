@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.7.0] — 2026-06-13
+
+The "ships to your SOC" release — the watchlist now forwards to any platform via the
+new suite-wide [`cognis-connect`](https://github.com/cognis-digital/cognis-connect) SDK.
+
+### Added
+- **`locate --emit {stix,misp,sigma,splunk,elastic,slack,discord,webhook}`** — maps each
+  flagged vessel to a canonical `Finding` (sanctioned -> critical) and forwards it:
+  STIX 2.1 / MISP / Sigma / Splunk HEC / Elastic `_bulk` / Slack / Discord / webhook.
+  `--emit-url`, `--emit-token`, `--emit-dry-run` (preview the exact request, send nothing).
+- `maritimeint/connect.py` — the watchlist->Finding bridge. cognis-connect is a **soft
+  dependency** (`pip install "cognis-maritimeint[connect]"`); `--emit` reports how to get
+  it if absent and the core is unaffected.
+- Tests for the mapping + STIX bundle + a dry-run Slack CLI round-trip (42 total).
+
 ## [0.6.0] — 2026-06-13
 
 The "every list, any feed" release — pull sanctioned-vessel designations from the four

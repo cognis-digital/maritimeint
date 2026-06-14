@@ -106,6 +106,12 @@ def build_parser() -> argparse.ArgumentParser:
     lo.add_argument("--model", default=None, help="model id for the add-in")
     lo.add_argument("--fail-on", choices=["low", "medium", "high"], default=None,
                     help="exit non-zero if any vessel is at/above this tier (compliance/CI gate)")
+    lo.add_argument("--emit", default=None,
+                    choices=["stix", "misp", "sigma", "splunk", "elastic", "slack", "discord", "webhook"],
+                    help="forward the watchlist to a platform via cognis-connect")
+    lo.add_argument("--emit-url", default=None, help="destination URL for --emit (HEC/webhook/MISP)")
+    lo.add_argument("--emit-token", default=None, help="auth token for --emit")
+    lo.add_argument("--emit-dry-run", action="store_true", help="preview the --emit request, don't send")
 
     vi = sub.add_parser("vision", help="triage maritime imagery for vessel presence (VL add-in)")
     vi.add_argument("image", help="image URL or data URI (e.g. a Sentinel-1/optical scene)")
@@ -279,6 +285,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     _emit(result, args.format)
+    # optional: forward the watchlist to a platform via cognis-connect
+    if args.command == "locate" and getattr(args, "emit", None):
+        from . import connect
+        try:
+            res = connect.forward(result, args.emit, url=args.emit_url,
+                                  token=args.emit_token, dry_run=args.emit_dry_run)
+        except (ImportError, ValueError) as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(res if isinstance(res, str) else json.dumps(res, indent=2), file=sys.stderr)
     # compliance/CI gate: non-zero exit if any vessel meets the risk threshold
     if args.command == "locate" and getattr(args, "fail_on", None):
         order = {"low": 1, "medium": 2, "high": 3}

@@ -197,6 +197,16 @@ flowchart LR
 
 Pipes into your stack: **SARIF** for code-scanning, **JSON** for anything, an **MCP server** (`maritimeint mcp`) for AI agents, and a webhook forwarder for SIEM/Slack/Jira. See [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
 
+**Forward the watchlist to your SOC** via [`cognis-connect`](https://github.com/cognis-digital/cognis-connect) — STIX/MISP/Sigma/Splunk/Elastic/Slack/Discord/webhook, in one flag:
+
+```bash
+pip install "cognis-maritimeint[connect]"
+maritimeint locate fleet.csv --sanctions s.json --emit stix > bundle.stix.json
+maritimeint locate fleet.csv --sanctions s.json --emit splunk --emit-url $HEC --emit-token $TOK
+maritimeint locate fleet.csv --sanctions s.json --emit slack  --emit-url $SLACK --emit-dry-run
+```
+Each flagged vessel becomes a canonical `Finding` (sanctioned → critical). `--emit-dry-run` previews the exact request without sending.
+
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="install-anywhere"></a>
