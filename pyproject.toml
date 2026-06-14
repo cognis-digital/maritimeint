@@ -35,3 +35,6 @@ maritimeint = "maritimeint.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["maritimeint"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
