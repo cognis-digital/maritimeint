@@ -6,3 +6,8 @@ build/
 .pytest_cache/
 *.html
 !demos/**
+
+# sibling clones used for local interop testing (not part of this repo)
+agentlex/
+cognis-connect/
+humind/
