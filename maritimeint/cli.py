@@ -70,10 +70,10 @@ def build_parser() -> argparse.ArgumentParser:
     _add_input(j)
     j.add_argument("--max-speed-kn", type=float, default=40.0)
 
-    l = sub.add_parser("loiter", help="detect loitering / STS staging")
-    _add_input(l)
-    l.add_argument("--radius-nm", type=float, default=2.0)
-    l.add_argument("--min-hours", type=float, default=4.0)
+    lt = sub.add_parser("loiter", help="detect loitering / STS staging")
+    _add_input(lt)
+    lt.add_argument("--radius-nm", type=float, default=2.0)
+    lt.add_argument("--min-hours", type=float, default=4.0)
 
     s = sub.add_parser("spoof", help="detect spoofing / identity conflicts")
     _add_input(s)
@@ -85,9 +85,30 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _positive_float(name: str, value: float) -> None:
+    """Raise SystemExit(2) with a clear message if value is not positive."""
+    if value <= 0:
+        print(f"error: --{name} must be a positive number, got {value}",
+              file=sys.stderr)
+        raise SystemExit(2)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    # Validate numeric arguments before loading data.
+    if args.command == "gaps":
+        _positive_float("gap-hours", args.gap_hours)
+    elif args.command == "jumps":
+        _positive_float("max-speed-kn", args.max_speed_kn)
+    elif args.command == "loiter":
+        _positive_float("radius-nm", args.radius_nm)
+        _positive_float("min-hours", args.min_hours)
+    elif args.command == "rendezvous":
+        _positive_float("proximity-nm", args.proximity_nm)
+        _positive_float("min-minutes", args.min_minutes)
+
     try:
         msgs = load_messages(args.input)
         if args.command == "analyze":

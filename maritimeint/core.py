@@ -22,13 +22,21 @@ from typing import Any, Iterable
 
 EARTH_RADIUS_NM = 3440.065  # nautical miles
 
+TOOL_NAME = "maritimeint"
+TOOL_VERSION = "0.3.9"
+
 
 def _parse_ts(value: str) -> datetime:
     """Parse an ISO-8601 timestamp into an aware UTC datetime."""
     s = value.strip()
+    if not s:
+        raise ValueError("timestamp field is empty")
     if s.endswith("Z"):
         s = s[:-1] + "+00:00"
-    dt = datetime.fromisoformat(s)
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        raise ValueError(f"unparseable timestamp: {value!r}")
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     return dt.astimezone(timezone.utc)
@@ -46,16 +54,34 @@ class AISMessage:
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "AISMessage":
+        if not isinstance(d, dict):
+            raise ValueError(f"AIS record must be a dict, got {type(d).__name__}")
         if "mmsi" not in d:
             raise ValueError("AIS record missing 'mmsi'")
+        mmsi_ref = d.get("mmsi")
         for key in ("timestamp", "lat", "lon"):
             if key not in d:
-                raise ValueError(f"AIS record for {d.get('mmsi')} missing '{key}'")
+                raise ValueError(f"AIS record for {mmsi_ref!r} missing '{key}'")
+        try:
+            lat = float(d["lat"])
+            lon = float(d["lon"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"AIS record for {mmsi_ref!r}: invalid lat/lon — {exc}"
+            ) from exc
+        if not (-90.0 <= lat <= 90.0):
+            raise ValueError(
+                f"AIS record for {mmsi_ref!r}: lat {lat} out of range [-90, 90]"
+            )
+        if not (-180.0 <= lon <= 180.0):
+            raise ValueError(
+                f"AIS record for {mmsi_ref!r}: lon {lon} out of range [-180, 180]"
+            )
         return cls(
             mmsi=str(d["mmsi"]),
             timestamp=_parse_ts(str(d["timestamp"])),
-            lat=float(d["lat"]),
-            lon=float(d["lon"]),
+            lat=lat,
+            lon=lon,
             name=str(d.get("name", "")),
             sog=None if d.get("sog") is None else float(d["sog"]),
             cog=None if d.get("cog") is None else float(d["cog"]),
@@ -69,15 +95,24 @@ class AISMessage:
 
 def parse_messages(data: Iterable[dict[str, Any]]) -> list[AISMessage]:
     """Parse raw AIS records into validated, time-sorted AISMessage objects."""
-    msgs = [AISMessage.from_dict(d) for d in data]
+    records = list(data)
+    msgs: list[AISMessage] = []
+    for i, d in enumerate(records):
+        try:
+            msgs.append(AISMessage.from_dict(d))
+        except (ValueError, TypeError) as exc:
+            raise ValueError(f"record[{i}]: {exc}") from exc
     msgs.sort(key=lambda m: (m.mmsi, m.timestamp))
     return msgs
 
 
 def load_messages(path: str) -> list[AISMessage]:
     """Load AIS records from a JSON file (list, or {\"messages\": [...]})."""
-    with open(path, "r", encoding="utf-8") as fh:
-        raw = json.load(fh)
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            raw = json.load(fh)
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"file is not valid UTF-8: {exc}") from exc
     if isinstance(raw, dict):
         raw = raw.get("messages", raw.get("records", []))
     if not isinstance(raw, list):
@@ -225,7 +260,8 @@ def detect_spoofing(msgs: list[AISMessage]) -> list[dict[str, Any]]:
             pins.setdefault((round(m.lat, 4), round(m.lon, 4)), []).append(m)
         for (plat, plon), group in pins.items():
             if len(group) >= 3:
-                span_h = (group[-1].timestamp - group[0].timestamp).total_seconds() / 3600.0
+                elapsed = group[-1].timestamp - group[0].timestamp
+                span_h = elapsed.total_seconds() / 3600.0
                 if span_h >= 1.0:
                     findings.append({
                         "type": "static_pin",
