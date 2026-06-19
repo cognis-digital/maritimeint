@@ -31,6 +31,20 @@ def _reason(f: dict[str, Any]) -> str:
         other = [v for v in f.get("vessels", [])]
         return (f"rendezvous {f.get('duration_minutes', '?')}min, "
                 f"min {f.get('min_distance_nm', '?')}nm (possible ship-to-ship transfer)")
+    if t == "dark_rendezvous":
+        return (f"went dark {f.get('gap_hours', '?')}h while another vessel loitered "
+                f"{f.get('min_distance_nm', '?')}nm away (possible dark STS transfer)")
+    if t == "circle_spoof":
+        return f"track circles {f.get('arc_degrees', '?')}deg in {f.get('radius_nm', '?')}nm (GPS spoofing)"
+    if t == "gps_jamming":
+        return f"{f.get('vessel_count', '?')} vessels pinned to one position (GPS jamming hotspot)"
+    if t == "zone_transit":
+        return (f"transited zone '{f.get('zone')}' ({f.get('zone_kind')}) "
+                f"for {f.get('dwell_hours', '?')}h")
+    if t == "port_call":
+        risk = f.get("risk", "")
+        tag = f" [{risk.upper()}]" if risk in ("sanctioned", "high") else ""
+        return f"port call at {f.get('port')}{tag} ({f.get('dwell_hours', '?')}h)"
     return t or "anomaly"
 
 

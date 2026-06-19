@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.8.0] — 2026-06-19
+
+The "spatial context + dark STS" release — four new detection layers that answer
+*where* an event happened and catch the evasion patterns the v0.7 detectors missed.
+All additive, standard-library, and folded into `analyze` / `locate`.
+
+### Added
+- **Zone intelligence (`maritimeint/zones.py`)** — define named areas (EEZs,
+  sanctioned ports, exclusion / war-risk zones) as GeoJSON or the native zone form;
+  `zones` command reports entry/exit + dwell, and `--zones` on `analyze`/`locate`
+  tags every finding with the zone(s) it falls in. Ray-casting point-in-polygon and
+  great-circle "circle" zones, zero deps.
+- **Dark-rendezvous correlation (`detect_dark_rendezvous`)** — the real dark-STS
+  signature: when one vessel switches off AIS, find the vessel still broadcasting at
+  the spot. `rendezvous` needs both parties live; this catches the one that goes dark.
+  New `dark-rendezvous` command.
+- **GPS spoofing / jamming (`detect_gps_anomalies`)** — `circle_spoof` (a track
+  populating the whole compass around a tight centroid — the "circling" artifact of
+  GPS spoofing near conflict zones) and `gps_jamming` (many distinct vessels pinned
+  to one synthetic position). New `gps` command.
+- **Port-call sequencing (`maritimeint/ports.py`)** — infer dwell-based port calls
+  from a built-in (or custom) port registry, sequence each vessel's itinerary, and
+  flag calls at sanctioned / high-risk ports and the legs between them. New
+  `port-calls` command (`--itinerary`, `--ports`).
+- 19 new tests (61 total).
+
 ## [0.7.0] — 2026-06-13
 
 The "ships to your SOC" release — the watchlist now forwards to any platform via the

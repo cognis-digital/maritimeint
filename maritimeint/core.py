@@ -294,6 +294,147 @@ def detect_rendezvous(
     return findings
 
 
+def detect_dark_rendezvous(
+    msgs: list[AISMessage],
+    gap_hours: float = 6.0,
+    proximity_nm: float = 5.0,
+) -> list[dict[str, Any]]:
+    """Correlate one vessel going dark with another loitering at the spot.
+
+    The real sanctions-evasion STS signature: a tanker switches off AIS, and a
+    lightering vessel sits near where it vanished / reappears. `detect_rendezvous`
+    needs *both* parties broadcasting; this catches the case where one stops.
+
+    For each AIS gap in vessel A, find vessels B still reporting *inside A's dark
+    window* and *near A's last-seen or first-seen position*.
+    """
+    findings: list[dict[str, Any]] = []
+    gaps = detect_gaps(msgs, gap_hours=gap_hours)
+    tracks = _by_vessel(msgs)
+    for g in gaps:
+        a_mmsi = g["mmsi"]
+        t0 = _parse_ts(g["dark_from"])
+        t1 = _parse_ts(g["dark_to"])
+        endpoints = [tuple(g["from"]), tuple(g["to"])]
+        for b_mmsi, b_track in tracks.items():
+            if b_mmsi == a_mmsi:
+                continue
+            best: tuple[float, datetime] | None = None
+            count = 0
+            for m in b_track:
+                if not (t0 <= m.timestamp <= t1):
+                    continue
+                d = min(haversine_nm(m.lat, m.lon, p[0], p[1]) for p in endpoints)
+                if d <= proximity_nm:
+                    count += 1
+                    if best is None or d < best[0]:
+                        best = (d, m.timestamp)
+            if best and count >= 1:
+                findings.append({
+                    "type": "dark_rendezvous",
+                    "vessels": [a_mmsi, b_mmsi],
+                    "dark_vessel": a_mmsi,
+                    "present_vessel": b_mmsi,
+                    "names": [g.get("name", ""), b_track[0].name],
+                    "min_distance_nm": round(best[0], 2),
+                    "present_reports": count,
+                    "gap_hours": g["gap_hours"],
+                    "dark_from": g["dark_from"],
+                    "dark_to": g["dark_to"],
+                    "at": best[1].isoformat().replace("+00:00", "Z"),
+                    "severity": "high",
+                })
+    return findings
+
+
+def _bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Initial great-circle bearing from point 1 to point 2, in degrees [0, 360)."""
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dl = math.radians(lon2 - lon1)
+    y = math.sin(dl) * math.cos(p2)
+    x = math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl)
+    return (math.degrees(math.atan2(y, x)) + 360.0) % 360.0
+
+
+def detect_gps_anomalies(
+    msgs: list[AISMessage],
+    circle_radius_nm: float = 3.0,
+    min_circle_points: int = 8,
+    jam_window_minutes: float = 30.0,
+    jam_min_vessels: int = 3,
+    jam_round: int = 3,
+) -> list[dict[str, Any]]:
+    """Detect GPS spoofing / jamming artifacts.
+
+    1. **circle_spoof** — a single track tracing >= 360 deg of cumulative turning
+       while confined to a small radius (the "ships circling an airport" artifact
+       seen under GPS spoofing near conflict zones).
+    2. **gps_jamming** — many *distinct* vessels reporting the near-identical
+       position within a short time window (a jamming hotspot snaps everyone to
+       one synthetic point).
+    """
+    findings: list[dict[str, Any]] = []
+
+    # 1. per-vessel circular drift, measured as angular coverage around the
+    #    track centroid: a spoofed "circling" track populates the whole compass
+    #    around its center, while a straight passage clusters into two opposite
+    #    bearings (a large angular gap). Robust to sampling density.
+    for mmsi, track in _by_vessel(msgs).items():
+        if len(track) < min_circle_points:
+            continue
+        clat = sum(m.lat for m in track) / len(track)
+        clon = sum(m.lon for m in track) / len(track)
+        max_r = max(haversine_nm(clat, clon, m.lat, m.lon) for m in track)
+        if max_r > circle_radius_nm or max_r < 1e-3:
+            continue
+        angles = sorted(_bearing(clat, clon, m.lat, m.lon) for m in track
+                        if haversine_nm(clat, clon, m.lat, m.lon) > 1e-4)
+        if len(angles) < min_circle_points:
+            continue
+        gaps = [b - a for a, b in zip(angles, angles[1:])]
+        gaps.append(360.0 - angles[-1] + angles[0])  # wrap-around gap
+        coverage = 360.0 - max(gaps)
+        if coverage >= 300.0:
+            findings.append({
+                "type": "circle_spoof",
+                "mmsi": mmsi,
+                "name": track[0].name,
+                "arc_degrees": round(coverage, 1),
+                "radius_nm": round(max_r, 2),
+                "reports": len(track),
+                "center": [round(clat, 5), round(clon, 5)],
+                "start": track[0].timestamp.isoformat().replace("+00:00", "Z"),
+                "end": track[-1].timestamp.isoformat().replace("+00:00", "Z"),
+                "severity": "high",
+            })
+
+    # 2. cross-vessel jamming hotspots
+    buckets: dict[tuple, dict[str, AISMessage]] = {}
+    win = jam_window_minutes * 60.0
+    for m in msgs:
+        tb = int(m.timestamp.timestamp() // win)
+        key = (round(m.lat, jam_round), round(m.lon, jam_round), tb)
+        buckets.setdefault(key, {})[m.mmsi] = m
+    seen: set[tuple] = set()
+    for (plat, plon, _tb), group in buckets.items():
+        if len(group) >= jam_min_vessels:
+            sig = (plat, plon)
+            if sig in seen:
+                continue
+            seen.add(sig)
+            ts = sorted(m.timestamp for m in group.values())
+            findings.append({
+                "type": "gps_jamming",
+                "position": [plat, plon],
+                "vessels": sorted(group),
+                "vessel_count": len(group),
+                "window_start": ts[0].isoformat().replace("+00:00", "Z"),
+                "window_end": ts[-1].isoformat().replace("+00:00", "Z"),
+                "severity": "high",
+            })
+    return findings
+
+
 def analyze(msgs: list[AISMessage], **kw: Any) -> dict[str, Any]:
     """Run the full detector suite and produce a scored summary report."""
     gaps = detect_gaps(msgs, gap_hours=kw.get("gap_hours", 6.0))
@@ -309,7 +450,19 @@ def analyze(msgs: list[AISMessage], **kw: Any) -> dict[str, Any]:
         proximity_nm=kw.get("rendezvous_nm", 0.5),
         min_minutes=kw.get("rendezvous_min_minutes", 30.0),
     )
-    findings = gaps + jumps + loiter + spoof + rdv
+    dark_rdv = detect_dark_rendezvous(
+        msgs,
+        gap_hours=kw.get("gap_hours", 6.0),
+        proximity_nm=kw.get("dark_rendezvous_nm", 5.0),
+    )
+    gps = detect_gps_anomalies(msgs)
+    findings = gaps + jumps + loiter + spoof + rdv + dark_rdv + gps
+
+    # optional spatial enrichment: tag every finding with the zones it falls in
+    zones = kw.get("zones")
+    if zones:
+        from .zones import annotate_findings
+        annotate_findings(findings, zones)
 
     weights = {"high": 3, "medium": 2, "low": 1}
     per_vessel: dict[str, int] = {}
@@ -332,6 +485,8 @@ def analyze(msgs: list[AISMessage], **kw: Any) -> dict[str, Any]:
             "loitering": len(loiter),
             "spoofing": len(spoof),
             "rendezvous": len(rdv),
+            "dark_rendezvous": len(dark_rdv),
+            "gps_anomaly": len(gps),
         },
         "risk_ranking": [{"mmsi": m, "risk_score": s} for m, s in vessels],
         "findings": findings,

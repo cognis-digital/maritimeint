@@ -154,7 +154,8 @@ MARITIMEINT watchlist (3 vessels, highest risk first):
 
 ```mermaid
 flowchart LR
-  AIS[AIS tracks<br/>JSON / CSV] --> DET[detectors<br/>gaps · spoofing · loitering · rendezvous]
+  AIS[AIS tracks<br/>JSON / CSV] --> DET[detectors<br/>gaps · spoofing · loitering · rendezvous<br/>dark-rendezvous · GPS spoof/jam · port-calls]
+  ZONES[(zones / geofences<br/>EEZ · ports · exclusion)] -.-> DET
   SANC[(sanctions list<br/>OFAC / EU / OFSI)] --> SC
   DET --> SC[risk scoring<br/>tier + plain-language reasons]
   SC --> WL[prioritized watchlist]

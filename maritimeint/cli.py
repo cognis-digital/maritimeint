@@ -61,6 +61,11 @@ def _add_input(p: argparse.ArgumentParser) -> None:
     p.add_argument("input", help="path to AIS JSON file")
 
 
+def _load_zones(path: str):
+    from .zones import load_zones
+    return load_zones(path)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
@@ -74,6 +79,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     a = sub.add_parser("analyze", help="run full detector suite + risk ranking")
     _add_input(a)
+    a.add_argument("--zones", default=None, help="zone/geofence GeoJSON to tag findings with location")
 
     g = sub.add_parser("gaps", help="detect AIS reporting gaps (going dark)")
     _add_input(g)
@@ -96,9 +102,29 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--proximity-nm", type=float, default=0.5)
     r.add_argument("--min-minutes", type=float, default=30.0)
 
+    dr = sub.add_parser("dark-rendezvous",
+                        help="correlate a vessel going dark with another loitering at the spot")
+    _add_input(dr)
+    dr.add_argument("--gap-hours", type=float, default=6.0)
+    dr.add_argument("--proximity-nm", type=float, default=5.0)
+
+    gp = sub.add_parser("gps", help="detect GPS spoofing (circling) / jamming hotspots")
+    _add_input(gp)
+
+    z = sub.add_parser("zones", help="detect zone/geofence entries, exits and dwell")
+    _add_input(z)
+    z.add_argument("--zones", required=True, help="zone GeoJSON / native zone list")
+
+    pc = sub.add_parser("port-calls", help="infer port calls + sequence itineraries (risk-tagged)")
+    _add_input(pc)
+    pc.add_argument("--ports", default=None, help="custom port registry JSON (else built-in)")
+    pc.add_argument("--min-dwell-hours", type=float, default=1.0)
+    pc.add_argument("--itinerary", action="store_true", help="sequence calls into per-vessel itineraries")
+
     lo = sub.add_parser("locate", help="prioritized + explained grey-fleet watchlist")
     _add_input(lo)
     lo.add_argument("--sanctions", default=None, help="sanctions list JSON to cross-reference")
+    lo.add_argument("--zones", default=None, help="zone/geofence GeoJSON to tag findings with location")
     lo.add_argument("--ai", action="store_true",
                     help="augment with the reasoning add-in if a model backend is reachable")
     lo.add_argument("--endpoint", default=None,
@@ -247,11 +273,14 @@ def main(argv: list[str] | None = None) -> int:
     try:
         msgs = load_messages(args.input)
         if args.command == "analyze":
-            result: Any = analyze(msgs)
+            zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
+            result: Any = analyze(msgs, zones=zones) if zones else analyze(msgs)
         elif args.command == "locate":
             sanctions = load_sanctions(args.sanctions) if args.sanctions else None
+            zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
             static = {m.mmsi: {"name": m.name} for m in msgs}
-            result = locate(msgs, sanctions=sanctions, static=static)
+            result = locate(msgs, sanctions=sanctions, static=static,
+                            **({"zones": zones} if zones else {}))
             if args.ai or args.endpoint:
                 from .addins import available, reasoning_assess
                 if args.endpoint:
@@ -278,6 +307,21 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "rendezvous":
             result = detect_rendezvous(msgs, proximity_nm=args.proximity_nm,
                                        min_minutes=args.min_minutes)
+        elif args.command == "dark-rendezvous":
+            from .core import detect_dark_rendezvous
+            result = detect_dark_rendezvous(msgs, gap_hours=args.gap_hours,
+                                            proximity_nm=args.proximity_nm)
+        elif args.command == "gps":
+            from .core import detect_gps_anomalies
+            result = detect_gps_anomalies(msgs)
+        elif args.command == "zones":
+            from .zones import detect_zone_transits
+            result = detect_zone_transits(msgs, _load_zones(args.zones))
+        elif args.command == "port-calls":
+            from .ports import detect_port_calls, sequence_itineraries, load_ports
+            ports = load_ports(args.ports) if args.ports else None
+            calls = detect_port_calls(msgs, ports=ports, min_dwell_hours=args.min_dwell_hours)
+            result = sequence_itineraries(calls) if args.itinerary else calls
         else:  # pragma: no cover
             parser.error(f"unknown command {args.command}")
             return 2
