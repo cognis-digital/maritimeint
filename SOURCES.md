@@ -57,3 +57,56 @@ synthetic, clearly labeled — production use should draw on the feeds below.)
 
 *Sourcing note: this list is compiled from public reporting and primary portals; confirm
 each before operational use.*
+
+<!-- cognis-2026-live-sources -->
+
+## Live 2026 sources (auto-expanded)
+
+_Always-current feeds, live web-search queries, and keyless APIs for real-time monitoring. Ingest at runtime with `livesearch.py`._
+
+### Maritime
+- **feed** · https://gcaptain.com/feed/
+- **feed** · https://www.maritime-executive.com/rss
+- **feed** · https://splash247.com/feed/
+- **feed** · https://www.tradewindsnews.com/rss
+- **feed** · https://lloydslist.com/rss
+- **live search** · `shadow fleet sanctioned tanker AIS`
+- **live search** · `ship-to-ship transfer sanctions evasion`
+- **live search** · `dark vessel AIS spoofing`
+- **live search** · `OFAC sanctioned vessel designation`
+- **live search** · `port disruption maritime security`
+- **api** · https://aisstream.io (free real-time AIS websocket, key required)
+- **api** · https://globalfishingwatch.org/our-apis/ (IUU / dark activity, free API token)
+- **api** · https://www.marinetraffic.com (consumer vessel tracking)
+
+### Conflict
+- **feed** · https://www.understandingwar.org/feeds/all.xml
+- **feed** · https://www.bellingcat.com/feed/
+- **feed** · https://www.acleddata.com/feed/
+- **feed** · https://www.aljazeera.com/xml/rss/all.xml
+- **feed** · https://feeds.bbci.co.uk/news/world/rss.xml
+- **live search** · `frontline situational awareness OSINT`
+- **live search** · `ceasefire escalation conflict monitor`
+- **live search** · `ISW Russia Ukraine assessment`
+- **live search** · `Middle East conflict live updates`
+- **api** · https://acleddata.com/data-export-tool/ (conflict events, free API)
+- **api** · https://ucdp.uu.se/apidocs/ (UCDP georeferenced events, free)
+- **api** · https://firms.modaps.eosdis.nasa.gov/api/ (NASA FIRMS fire/strike proxy, free)
+- **api** · https://opensky-network.org/apidoc/ (live aircraft, free)
+
+### Geopolitics
+- **feed** · https://www.reuters.com/arc/outboundfeeds/v3/all/?outputType=xml
+- **feed** · https://apnews.com/hub/ap-top-news/feed
+- **feed** · https://foreignpolicy.com/feed/
+- **live search** · `new sanctions package designation 2026`
+- **live search** · `diplomatic crisis summit 2026`
+- **live search** · `trade tariff policy change`
+
+### Supply Chain
+- **feed** · https://www.supplychaindive.com/feeds/news/
+- **feed** · https://www.freightwaves.com/news/feed
+- **live search** · `port congestion shipping delay 2026`
+- **live search** · `tariff supply chain disruption`
+- **live search** · `semiconductor export control`
+- **api** · https://comtradeapi.un.org (UN Comtrade, free key)
+
