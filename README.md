@@ -20,9 +20,21 @@ pip install cognis-maritimeint
 maritimeint locate demos/ais_sample.json   # → prioritized grey-fleet watchlist in seconds
 ```
 
+> ## 🆕 New in v0.8 — *spatial intelligence, dark-STS & live 2026 sources*
+>
+> | | What changed | Try it |
+> |---|---|---|
+> | 🗺️ | **Zone intelligence (geofencing)** — define EEZs, sanctioned ports & exclusion / war-risk zones as GeoJSON; **every finding is tagged with *where* it happened** | `maritimeint zones ais.json --zones zones.geojson` |
+> | 🌑 | **Dark-rendezvous correlation** — the real dark-STS move: one tanker kills AIS while another loiters at the spot (the case plain `rendezvous` can't see) | `maritimeint dark-rendezvous ais.json` |
+> | 📡 | **GPS spoofing & jamming** — flags *circling* spoof tracks and jamming hotspots where many vessels snap to one synthetic position | `maritimeint gps ais.json` |
+> | ⚓ | **Port-call sequencing** — reconstructs each vessel's itinerary and flags **sanctioned-port legs** | `maritimeint port-calls ais.json --itinerary` |
+> | 🔴 | **3× more sources + real-time scraping** — source catalog **tripled with live 2026 feeds**, plus a new **keyless `livesearch`** module that pulls current OSINT at runtime (Google News · RSS/Atom · DuckDuckGo), no API keys | `python -m livesearch "sanctioned tanker" --when 7d` |
+>
+> *All four detectors are pure-stdlib, additive layers folded into `analyze` / `locate` — see [the v0.8 walkthrough](#v08) and [`demos/04-dark-sts-zones`](demos/04-dark-sts-zones).*
+
 ## Contents
 
-- [Why maritimeint?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
+- [Why maritimeint?](#why) · [Features](#features) · [What's new in v0.8](#v08) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
 
 <a name="why"></a>
 ## Why maritimeint?
@@ -44,6 +56,11 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 - ✅ Detect Loitering
 - ✅ Detect Spoofing
 - ✅ Detect Rendezvous (ship-to-ship transfer signature)
+- ✅ **Dark-rendezvous correlation** `v0.8` — one vessel goes dark while another loiters at the vanish point (the dark-STS signature `rendezvous` misses, because only one party is broadcasting)
+- ✅ **Zone intelligence / geofencing** `v0.8` — GeoJSON or native polygons + great-circle "circle" zones (EEZs · sanctioned ports · exclusion / war-risk); entry/exit/dwell events + **every positional finding tagged with its zone**
+- ✅ **GPS spoofing & jamming** `v0.8` — `circle_spoof` (a track populating the whole compass around a tight centroid) + `gps_jamming` (many distinct MMSIs pinned to one synthetic position)
+- ✅ **Port-call sequencing** `v0.8` — dwell-based port calls from a built-in (or custom) registry, sequenced into per-vessel itineraries with **sanctioned-port legs flagged**
+- ✅ **Live 2026 sources + real-time scraping** `v0.8` — `livesearch.py`: keyless, stdlib, real-time web-search + RSS/Atom ingestion (`web_search` · `fetch_feed` · `ddg_search` · `harvest`); the [`SOURCES.md`](SOURCES.md) catalog now carries 3× the feeds, queries & APIs
 - ✅ **LocateAnything watchlist** — one call → prioritized, *explained* grey-fleet watchlist (HIGH/MEDIUM/LOW + plain-language reasons)
 - ✅ **Sanctions cross-reference** — match tracked vessels to an OFAC/EU/OFSI-style list by MMSI / IMO / name
 - ✅ **Composable AI add-ins** — optional vision (imagery triage) + reasoning (narrative assessment) that *stack* onto the stdlib core, via the Cognis fleet / **edgemesh**; hardware/availability-gated (off if no backend)
@@ -146,6 +163,63 @@ MARITIMEINT watchlist (3 vessels, highest risk first):
   [MEDIUM] 210444000 GHOST RUNNER  score=3
         - implausible 462.2kn position jump (possible spoofing)
 ```
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
+<a name="v08"></a>
+## v0.8 — spatial intelligence, dark-STS & live sources
+
+Four additive, pure-stdlib detection layers (all folded into `analyze` / `locate`, so
+they enrich the watchlist automatically) plus a keyless real-time source feed. Run the
+whole story end-to-end with [`demos/04-dark-sts-zones`](demos/04-dark-sts-zones):
+
+```bash
+# full suite + spatial context: every finding tagged with the zone it falls in
+maritimeint --format json analyze demos/04-dark-sts-zones/feed.json \
+    --zones demos/04-dark-sts-zones/zones.geojson
+
+maritimeint dark-rendezvous demos/04-dark-sts-zones/feed.json   # dark-STS correlation
+maritimeint gps             demos/04-dark-sts-zones/feed.json   # spoofing / jamming
+maritimeint zones           demos/04-dark-sts-zones/feed.json --zones demos/04-dark-sts-zones/zones.geojson
+maritimeint port-calls      demos/04-dark-sts-zones/feed.json --itinerary   # Kharg (sanctioned) → Singapore
+```
+
+**🗺️ Zone intelligence (`zones.py`)** — define areas an analyst cares about as GeoJSON
+(`FeatureCollection` / `Feature` / geometry) or the native form, with **polygon**
+(ray-cast point-in-polygon) or **circle** (`center` + `radius_nm`) geometry. `--zones`
+on `analyze`/`locate` annotates every positional finding with the zone(s) it falls in;
+the `zones` command reports entry/exit + dwell, severity-weighted by `kind`
+(`sanctioned_port` / `exclusion` / `war_risk` → high).
+
+**🌑 Dark-rendezvous (`detect_dark_rendezvous`)** — `rendezvous` needs *both* vessels
+broadcasting. This catches the evasion that matters: vessel A switches off AIS, and
+vessel B keeps reporting **at A's vanish / reappear point during the dark window** — the
+lightering ship sitting on the spot. Returns the pair, the closest approach, and the gap.
+
+**📡 GPS spoofing & jamming (`detect_gps_anomalies`)** — two artifacts:
+`circle_spoof` measures **angular coverage around the track centroid** (a spoofed
+"circling" track populates the whole compass within a tiny radius; a straight passage
+never does), and `gps_jamming` finds **many distinct MMSIs snapped to one position**
+within a short window (the classic jamming hotspot).
+
+**⚓ Port-call sequencing (`ports.py`)** — infers dwell-based calls from a built-in
+registry (includes Kharg Island, Bandar Abbas, Primorsk, Ust-Luga, Nakhodka, Tartus,
+Nampo…) or your own (`--ports`), then `--itinerary` sequences each vessel's calls and
+flags the **load-dirty → sell-clean** legs that touch a sanctioned / high-risk port.
+
+**🔴 Live 2026 sources + real-time scraping (`livesearch.py`)** — keyless, zero-dependency
+real-time ingestion so monitoring stays *current*, not static:
+
+```bash
+python -m livesearch "shadow fleet sanctioned tanker" --when 7d   # live Google-News RSS search
+python -m livesearch --feed https://gcaptain.com/feed/ --json     # any RSS/Atom feed
+python -c "import livesearch as ls; print(len(ls.harvest([{'query':'OFAC sanctioned vessel'}, \
+    'https://gcaptain.com/feed/'], since_days=14)))"               # mixed harvest, deduped, 2026-only
+```
+
+`web_search()` uses Google News RSS as a keyless search backend, `fetch_feed()` parses
+any RSS 2.0 / Atom feed, `ddg_search()` scrapes DuckDuckGo HTML, and `harvest()` runs a
+mixed list of feeds + queries, keeping only recent (≥ 2026) items, de-duped, newest-first.
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
@@ -284,4 +358,4 @@ Source-available under the **Cognis Open Collaboration License (COCL) v1.0** —
 ---
 📡 **[Interop map](INTEROP.md)** — how this repo composes with the rest of the Cognis suite (private-AI backbone, agent language + cognition, domain intelligence).
 
-📚 **[Sources & data](SOURCES.md)** — the real authoritative maritime-domain sources (OFAC SDN, AIS feeds, Sentinel-1, Equasis, C4ADS, CSIS/RUSI) behind the detectors, risk model, and sanctions screening.
+📚 **[Sources & data](SOURCES.md)** — the real authoritative maritime-domain sources (OFAC SDN, AIS feeds, Sentinel-1, Equasis, C4ADS, CSIS/RUSI) behind the detectors, risk model, and sanctions screening — now **3× expanded** with live 2026 feeds, search queries & keyless APIs, ingestible at runtime via [`livesearch.py`](livesearch.py).
