@@ -7,5 +7,13 @@ try:
     from maritimeint.core import TOOL_NAME, TOOL_VERSION
 except Exception:  # pragma: no cover
     TOOL_NAME = "maritimeint"
-    TOOL_VERSION = "0.8.0"
+    TOOL_VERSION = "0.9.0"
 __version__ = TOOL_VERSION
+
+# Native, dependency-free intelligence export (GeoJSON / KML / STIX 2.1 / CSV).
+try:
+    from maritimeint.intel import (  # noqa: F401
+        export, to_geojson, to_kml, to_stix, to_csv,
+    )
+except Exception:  # pragma: no cover
+    pass

@@ -145,6 +145,14 @@ def build_parser() -> argparse.ArgumentParser:
     vi.add_argument("--model", default=None)
     vi.add_argument("--note", default="", help="optional context for the triage")
 
+    ex = sub.add_parser("export",
+                        help="run analysis and export findings as GeoJSON / KML / STIX 2.1 / CSV")
+    _add_input(ex)
+    ex.add_argument("--to", choices=["geojson", "kml", "stix", "csv"], default="geojson",
+                    help="export format (default: geojson)")
+    ex.add_argument("--zones", default=None, help="zone GeoJSON to tag findings with location")
+    ex.add_argument("-o", "--output", default=None, help="write to file instead of stdout")
+
     sub.add_parser("menu", help="interactive multi-level menu")
     sub.add_parser("addins", help="show available AI add-ins (VL + reasoning) and their backends")
 
@@ -272,6 +280,20 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         msgs = load_messages(args.input)
+        if args.command == "export":
+            from . import intel
+            zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
+            analysis = analyze(msgs, zones=zones) if zones else analyze(msgs)
+            text = intel.export(analysis, args.to)
+            if args.output:
+                with open(args.output, "w", encoding="utf-8") as fh:
+                    fh.write(text if text.endswith("\n") else text + "\n")
+                print(f"wrote {args.to} export "
+                      f"({len(analysis.get('findings', []))} findings) to {args.output}",
+                      file=sys.stderr)
+            else:
+                print(text)
+            return 0
         if args.command == "analyze":
             zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
             result: Any = analyze(msgs, zones=zones) if zones else analyze(msgs)

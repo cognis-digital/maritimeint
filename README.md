@@ -61,6 +61,7 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 - ✅ **GPS spoofing & jamming** `v0.8` — `circle_spoof` (a track populating the whole compass around a tight centroid) + `gps_jamming` (many distinct MMSIs pinned to one synthetic position)
 - ✅ **Port-call sequencing** `v0.8` — dwell-based port calls from a built-in (or custom) registry, sequenced into per-vessel itineraries with **sanctioned-port legs flagged**
 - ✅ **Live 2026 sources + real-time scraping** `v0.8` — `livesearch.py`: keyless, stdlib, real-time web-search + RSS/Atom ingestion (`web_search` · `fetch_feed` · `ddg_search` · `harvest`); the [`SOURCES.md`](SOURCES.md) catalog now carries 3× the feeds, queries & APIs
+- ✅ **Native intel export** `v0.9` — turn any analysis into **GeoJSON** (Leaflet/Mapbox/QGIS/kepler.gl), **KML** (Google Earth / marine charts), **STIX 2.1** bundle (threat-intel platforms) or **CSV** — zero dependencies: `maritimeint export ais.json --to geojson`
 - ✅ **LocateAnything watchlist** — one call → prioritized, *explained* grey-fleet watchlist (HIGH/MEDIUM/LOW + plain-language reasons)
 - ✅ **Sanctions cross-reference** — match tracked vessels to an OFAC/EU/OFSI-style list by MMSI / IMO / name
 - ✅ **Composable AI add-ins** — optional vision (imagery triage) + reasoning (narrative assessment) that *stack* onto the stdlib core, via the Cognis fleet / **edgemesh**; hardware/availability-gated (off if no backend)
@@ -141,8 +142,27 @@ maritimeint locate demos/ais_sample.json             # prioritized, explained wa
 maritimeint locate demos/ais_sample.csv              # CSV in too (real AIS-provider exports)
 maritimeint --format json locate demos/ais_sample.json   # machine-readable
 maritimeint locate fleet.csv --sanctions ofac.json --fail-on high   # compliance/CI gate (exit≠0)
+maritimeint export demos/ais_sample.json --to geojson -o findings.geojson   # map-ready
 maritimeint menu                                     # interactive multi-level menu
 ```
+
+### Export & share the intelligence
+
+`maritimeint export` runs the full detector suite and serializes the findings
+into the format your workflow needs — **no extra dependencies**:
+
+```bash
+maritimeint export ais.json --to geojson -o findings.geojson  # Leaflet/Mapbox/QGIS/kepler.gl
+maritimeint export ais.json --to kml     -o findings.kml      # Google Earth / marine charts
+maritimeint export ais.json --to stix    -o findings.json     # STIX 2.1 bundle for TIPs
+maritimeint export ais.json --to csv     -o findings.csv      # spreadsheets / notebooks
+maritimeint export ais.json --to geojson --zones eez.geojson  # tag findings with zones first
+```
+
+GeoJSON/KML use `[lon, lat]` ordering and render every positional finding as a
+point or track; the STIX bundle emits one deterministic-id `indicator` per
+finding (ATT&CK-friendly, `x_maritime` custom props preserved). For pushing a
+*watchlist* to MISP/Splunk/Elastic/Slack, see `locate --emit` (via cognis-connect).
 
 **Works with whatever model backend you run** — set `MARITIMEINT_ENDPOINT` (or
 `OPENAI_BASE_URL`) to your fleet/gateway, or let it auto-discover one on the common
