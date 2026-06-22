@@ -42,10 +42,11 @@ def _emit(obj: Any, fmt: str) -> None:
               f"messages={obj['messages']}")
         print("finding counts:")
         for k, v in obj["finding_counts"].items():
-            print(f"  {k:<12} {v}")
-        print("risk ranking:")
-        for row in obj["risk_ranking"]:
-            print(f"  {row['mmsi']:<12} score={row['risk_score']}")
+            print(f"  {k:<14} {v}")
+        if obj.get("risk_ranking"):
+            print("risk ranking:")
+            for row in obj["risk_ranking"]:
+                print(f"  {row['mmsi']:<12} score={row['risk_score']}")
         print(f"findings ({len(obj['findings'])}):")
         rows = obj["findings"]
     else:
@@ -110,6 +111,37 @@ def build_parser() -> argparse.ArgumentParser:
 
     gp = sub.add_parser("gps", help="detect GPS spoofing (circling) / jamming hotspots")
     _add_input(gp)
+
+    cq = sub.add_parser("close-quarters",
+                        help="CPA/TCPA: vessel pairs projected to pass dangerously close")
+    _add_input(cq)
+    cq.add_argument("--cpa-nm", type=float, default=0.5,
+                    help="closest-point-of-approach danger radius (default 0.5 nm)")
+    cq.add_argument("--tcpa-max-minutes", type=float, default=30.0,
+                    help="only flag if CPA occurs within this many minutes")
+
+    sh = sub.add_parser("shadowing",
+                        help="detect one vessel persistently trailing another at standoff")
+    _add_input(sh)
+    sh.add_argument("--standoff-max-nm", type=float, default=8.0)
+    sh.add_argument("--min-minutes", type=float, default=90.0)
+
+    cv = sub.add_parser("convoy",
+                        help="detect groups of vessels moving together (co-movement)")
+    _add_input(cv)
+    cv.add_argument("--cluster-nm", type=float, default=3.0)
+    cv.add_argument("--min-vessels", type=int, default=3)
+
+    df = sub.add_parser("drift",
+                        help="detect adrift / not-under-command vessels (safety/distress)")
+    _add_input(df)
+    df.add_argument("--max-sog-kn", type=float, default=1.5)
+    df.add_argument("--min-minutes", type=float, default=60.0)
+
+    en = sub.add_parser("encounters",
+                        help="run the full track-interaction suite (CPA + shadow + convoy + drift)")
+    _add_input(en)
+    en.add_argument("--zones", default=None, help="zone GeoJSON to tag findings with location")
 
     z = sub.add_parser("zones", help="detect zone/geofence entries, exits and dwell")
     _add_input(z)
@@ -402,6 +434,26 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "gps":
             from .core import detect_gps_anomalies
             result = detect_gps_anomalies(msgs)
+        elif args.command == "close-quarters":
+            from .encounters import detect_close_quarters
+            result = detect_close_quarters(msgs, cpa_nm=args.cpa_nm,
+                                           tcpa_max_minutes=args.tcpa_max_minutes)
+        elif args.command == "shadowing":
+            from .encounters import detect_shadowing
+            result = detect_shadowing(msgs, standoff_max_nm=args.standoff_max_nm,
+                                      min_minutes=args.min_minutes)
+        elif args.command == "convoy":
+            from .encounters import detect_convoy
+            result = detect_convoy(msgs, cluster_nm=args.cluster_nm,
+                                   min_vessels=args.min_vessels)
+        elif args.command == "drift":
+            from .encounters import detect_drift
+            result = detect_drift(msgs, max_sog_kn=args.max_sog_kn,
+                                  min_minutes=args.min_minutes)
+        elif args.command == "encounters":
+            from .encounters import analyze_encounters
+            zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
+            result = analyze_encounters(msgs, zones=zones) if zones else analyze_encounters(msgs)
         elif args.command == "zones":
             from .zones import detect_zone_transits
             result = detect_zone_transits(msgs, _load_zones(args.zones))

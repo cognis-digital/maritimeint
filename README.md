@@ -20,7 +20,19 @@ pip install cognis-maritimeint
 maritimeint locate demos/ais_sample.json   # → prioritized grey-fleet watchlist in seconds
 ```
 
-> ## 🆕 New in v0.8 — *spatial intelligence, dark-STS & live 2026 sources*
+> ## 🆕 New in v0.9 — *track-interaction & vessel-behaviour intelligence*
+>
+> | | What changed | Try it |
+> |---|---|---|
+> | 🎯 | **CPA / TCPA close-quarters** — Closest Point of Approach + Time to CPA for every vessel pair; flags *converging* tracks projected to pass inside a danger radius (collision avoidance / standoff-perimeter breach). Pure relative-motion math — **separation only, never an intercept** | `maritimeint close-quarters ais.json` |
+> | 🛰️ | **Shadowing** — one vessel persistently *trailing* another at a held standoff on a matched course (surveillance / interdiction / escort-precursor signature — distinct from a rendezvous) | `maritimeint shadowing ais.json` |
+> | 🚢 | **Convoy / co-movement** — clusters of vessels moving *together* (tight grouping + matched heading & speed across epochs): escort groups & shepherded grey-fleet flotillas single-vessel detection misses | `maritimeint convoy ais.json` |
+> | 🆘 | **Drift / not-under-command** — near-zero speed with erratic heading swing → disabled / dragging / possible-distress **safety** early-warning | `maritimeint drift ais.json` |
+> | 🧩 | **`encounters` mode** + folded into `analyze` — all four run in one pass, score the risk ranking, and export to GeoJSON/KML/STIX/CSV unchanged | `maritimeint encounters ais.json` |
+>
+> *All four are pure-stdlib, additive layers — see the [encounters guide](docs/ENCOUNTERS.md) and [`demos/05-encounters`](demos/05-encounters).*
+
+> ## New in v0.8 — *spatial intelligence, dark-STS & live 2026 sources*
 >
 > | | What changed | Try it |
 > |---|---|---|
@@ -56,6 +68,11 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 - ✅ Detect Loitering
 - ✅ Detect Spoofing
 - ✅ Detect Rendezvous (ship-to-ship transfer signature)
+- ✅ **CPA / TCPA close-quarters** `v0.9` — Closest Point of Approach + Time to CPA per vessel pair; flags *converging* tracks projected to pass inside a danger radius (the bridge collision-avoidance primitive, applied to AIS history for safety & force-protection standoff monitoring — separation only, no intercept/targeting)
+- ✅ **Shadowing** `v0.9` — one vessel persistently *trailing* another at a held standoff on a matched course; reports leader/follower roles (surveillance / interdiction / escort-precursor signature, distinct from a rendezvous)
+- ✅ **Convoy / co-movement clustering** `v0.9` — groups of vessels moving as one formation (proximity + matched heading & speed across epochs): escort groups & shepherded flotillas single-vessel detection treats as unrelated
+- ✅ **Drift / not-under-command** `v0.9` — near-zero speed with erratic heading swing → disabled / anchor-dragging / possible-distress safety early-warning
+- ✅ **`encounters` mode** `v0.9` — runs all four interaction/behaviour detectors in one pass; also folded into `analyze` so they score the risk ranking and flow through every exporter ([guide](docs/ENCOUNTERS.md))
 - ✅ **Dark-rendezvous correlation** `v0.8` — one vessel goes dark while another loiters at the vanish point (the dark-STS signature `rendezvous` misses, because only one party is broadcasting)
 - ✅ **Zone intelligence / geofencing** `v0.8` — GeoJSON or native polygons + great-circle "circle" zones (EEZs · sanctioned ports · exclusion / war-risk); entry/exit/dwell events + **every positional finding tagged with its zone**
 - ✅ **GPS spoofing & jamming** `v0.8` — `circle_spoof` (a track populating the whole compass around a tight centroid) + `gps_jamming` (many distinct MMSIs pinned to one synthetic position)

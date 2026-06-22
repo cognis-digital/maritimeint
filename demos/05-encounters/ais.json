@@ -1,0 +1,112 @@
+{
+  "messages": [
+    {
+      "mmsi": "CQ_A",
+      "timestamp": "2026-01-04T12:00:00Z",
+      "lat": 25.0,
+      "lon": 55.0,
+      "name": "ALPHA",
+      "sog": 12,
+      "cog": 90
+    },
+    {
+      "mmsi": "CQ_B",
+      "timestamp": "2026-01-04T12:00:00Z",
+      "lat": 25.0,
+      "lon": 55.3,
+      "name": "BRAVO",
+      "sog": 12,
+      "cog": 270
+    },
+    {
+      "mmsi": "CQ_A",
+      "timestamp": "2026-01-04T12:02:00Z",
+      "lat": 25.0,
+      "lon": 55.02,
+      "name": "ALPHA",
+      "sog": 12,
+      "cog": 90
+    },
+    {
+      "mmsi": "CQ_B",
+      "timestamp": "2026-01-04T12:02:00Z",
+      "lat": 25.0,
+      "lon": 55.28,
+      "name": "BRAVO",
+      "sog": 12,
+      "cog": 270
+    },
+    {
+      "mmsi": "CQ_A",
+      "timestamp": "2026-01-04T12:04:00Z",
+      "lat": 25.0,
+      "lon": 55.04,
+      "name": "ALPHA",
+      "sog": 12,
+      "cog": 90
+    },
+    {
+      "mmsi": "CQ_B",
+      "timestamp": "2026-01-04T12:04:00Z",
+      "lat": 25.0,
+      "lon": 55.26,
+      "name": "BRAVO",
+      "sog": 12,
+      "cog": 270
+    },
+    {
+      "mmsi": "CQ_A",
+      "timestamp": "2026-01-04T12:06:00Z",
+      "lat": 25.0,
+      "lon": 55.06,
+      "name": "ALPHA",
+      "sog": 12,
+      "cog": 90
+    },
+    {
+      "mmsi": "CQ_B",
+      "timestamp": "2026-01-04T12:06:00Z",
+      "lat": 25.0,
+      "lon": 55.24,
+      "name": "BRAVO",
+      "sog": 12,
+      "cog": 270
+    },
+    {
+      "mmsi": "CQ_A",
+      "timestamp": "2026-01-04T12:08:00Z",
+      "lat": 25.0,
+      "lon": 55.08,
+      "name": "ALPHA",
+      "sog": 12,
+      "cog": 90
+    },
+    {
+      "mmsi": "CQ_B",
+      "timestamp": "2026-01-04T12:08:00Z",
+      "lat": 25.0,
+      "lon": 55.22,
+      "name": "BRAVO",
+      "sog": 12,
+      "cog": 270
+    },
+    {
+      "mmsi": "CQ_A",
+      "timestamp": "2026-01-04T12:10:00Z",
+      "lat": 25.0,
+      "lon": 55.1,
+      "name": "ALPHA",
+      "sog": 12,
+      "cog": 90
+    },
+    {
+      "mmsi": "CQ_B",
+      "timestamp": "2026-01-04T12:10:00Z",
+      "lat": 25.0,
+      "lon": 55.2,
+      "name": "BRAVO",
+      "sog": 12,
+      "cog": 270
+    }
+  ]
+}

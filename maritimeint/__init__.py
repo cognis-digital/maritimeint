@@ -17,3 +17,12 @@ try:
     )
 except Exception:  # pragma: no cover
     pass
+
+# Track-interaction & behaviour detectors (CPA/TCPA, shadowing, convoy, drift).
+try:
+    from maritimeint.encounters import (  # noqa: F401
+        detect_close_quarters, detect_shadowing, detect_convoy, detect_drift,
+        analyze_encounters,
+    )
+except Exception:  # pragma: no cover
+    pass

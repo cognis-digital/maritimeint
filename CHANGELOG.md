@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.9.0] — 2026-06-22
+
+The "track-interaction & behaviour" release — a new analysis layer
+(`maritimeint/encounters.py`) that reasons about how vessel *tracks relate to one
+another* and how a single track *behaves over time*, rather than scoring each
+vessel in isolation. All pure standard library, additive, folded into `analyze`,
+and exported through the existing GeoJSON / KML / STIX 2.1 / CSV pipeline.
+
+Defensive / situational-awareness / OSINT only: every output is a *separation* or a
+*pattern label* for an analyst. No intercept planning, maneuvering instructions,
+targeting, or fire-control of any kind.
+
+### Added
+- **CPA / TCPA close-quarters (`detect_close_quarters`, `close-quarters` command)**
+  — Closest Point of Approach distance and Time to CPA between every vessel pair via
+  the standard relative-motion model (reported `sog`/`cog`, or derived from
+  neighbouring fixes). Flags *converging* tracks projected to pass inside a danger
+  radius within a TCPA bound. Diverging or safely-parallel pairs do not trip it.
+- **Shadowing (`detect_shadowing`, `shadowing` command)** — one vessel persistently
+  trailing another at a held standoff `[min, max]` nm on a matched course over an
+  extended window; identifies leader/follower roles. Distinct from `rendezvous`
+  (which closes to contact) and `convoy` (a tight abreast cluster).
+- **Convoy / co-movement (`detect_convoy`, `convoy` command)** — single-link
+  clustering per time-epoch where edges require proximity *and* matched heading *and*
+  matched speed; a membership set that re-forms across multiple epochs is a convoy.
+  Surfaces escort groups & shepherded flotillas single-vessel detection misses.
+- **Drift / not-under-command (`detect_drift`, `drift` command)** — runs of
+  near-zero-speed fixes with a wide heading swing → disabled / dragging / possible
+  distress. A safety early-warning, not an anomaly-of-intent. Catches unreported
+  `sog` via displacement.
+- **`encounters` command + `analyze_encounters`** — runs all four in one pass; also
+  folded into `core.analyze` so the new findings appear in `finding_counts`, score
+  the per-vessel risk ranking, and flow through every exporter unchanged.
+- **Docs** — `docs/ENCOUNTERS.md` (use-case walkthrough, frank threat/defensive
+  framing, tuning table, candid limitations) + a generated `docs/encounters.svg`
+  diagram (CC0, no third-party assets) + `demos/05-encounters`.
+- **Tests** — `tests/test_encounters.py`: 77 new offline tests covering each detector,
+  edge/negative cases, CPA math, `analyze` integration, exporters, and CLI.
+
 ## [0.8.0] — 2026-06-19
 
 The "spatial context + dark STS" release — four new detection layers that answer

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <!-- Generated diagram (no third-party assets). CC0 / public domain. -->
+  <rect width="760" height="420" fill="#0b1f33"/>
+  <text x="380" y="30" fill="#ffffff" font-size="20" font-weight="600" text-anchor="middle">MARITIMEINT v0.9 — track-interaction signatures</text>
+
+  <!-- panel 1: close quarters (CPA/TCPA) -->
+  <g transform="translate(20,55)">
+    <rect width="340" height="155" rx="8" fill="#13314f" stroke="#2b6cb0"/>
+    <text x="14" y="24" fill="#9ad" font-size="14" font-weight="600">close_quarters  (CPA / TCPA)</text>
+    <line x1="30" y1="120" x2="200" y2="60" stroke="#5ad1c0" stroke-width="3"/>
+    <polygon points="200,60 188,58 194,68" fill="#5ad1c0"/>
+    <line x1="310" y1="120" x2="140" y2="60" stroke="#f2a65a" stroke-width="3"/>
+    <polygon points="140,60 152,58 146,68" fill="#f2a65a"/>
+    <circle cx="170" cy="60" r="6" fill="none" stroke="#ff5a5a" stroke-width="2"/>
+    <text x="170" y="48" fill="#ff8a8a" font-size="11" text-anchor="middle">CPA &lt; danger radius</text>
+    <text x="14" y="145" fill="#cfe" font-size="11">converging tracks projected to pass close → collision / perimeter breach</text>
+  </g>
+
+  <!-- panel 2: shadowing -->
+  <g transform="translate(400,55)">
+    <rect width="340" height="155" rx="8" fill="#13314f" stroke="#2b6cb0"/>
+    <text x="14" y="24" fill="#9ad" font-size="14" font-weight="600">shadowing  (persistent trail)</text>
+    <line x1="40" y1="100" x2="300" y2="100" stroke="#5ad1c0" stroke-width="3"/>
+    <polygon points="300,100 288,95 288,105" fill="#5ad1c0"/>
+    <text x="305" y="92" fill="#5ad1c0" font-size="11">LEAD</text>
+    <line x1="40" y1="125" x2="250" y2="125" stroke="#f2a65a" stroke-width="3" stroke-dasharray="6 4"/>
+    <polygon points="250,125 238,120 238,130" fill="#f2a65a"/>
+    <text x="255" y="133" fill="#f2a65a" font-size="11">FOLLOWER</text>
+    <line x1="250" y1="125" x2="290" y2="103" stroke="#888" stroke-width="1" stroke-dasharray="2 2"/>
+    <text x="14" y="148" fill="#cfe" font-size="11">held standoff + matched course, not closing → surveillance / escort</text>
+  </g>
+
+  <!-- panel 3: convoy -->
+  <g transform="translate(20,225)">
+    <rect width="340" height="170" rx="8" fill="#13314f" stroke="#2b6cb0"/>
+    <text x="14" y="24" fill="#9ad" font-size="14" font-weight="600">convoy  (co-movement cluster)</text>
+    <g stroke="#5ad1c0" stroke-width="3" fill="none">
+      <line x1="60" y1="120" x2="260" y2="60"/>
+      <line x1="60" y1="135" x2="260" y2="75"/>
+      <line x1="60" y1="150" x2="260" y2="90"/>
+    </g>
+    <g fill="#5ad1c0">
+      <polygon points="260,60 248,60 254,70"/>
+      <polygon points="260,75 248,75 254,85"/>
+      <polygon points="260,90 248,90 254,100"/>
+    </g>
+    <text x="14" y="162" fill="#cfe" font-size="11">tight cluster + matched heading &amp; speed across epochs → flotilla / escort group</text>
+  </g>
+
+  <!-- panel 4: drift -->
+  <g transform="translate(400,225)">
+    <rect width="340" height="170" rx="8" fill="#13314f" stroke="#2b6cb0"/>
+    <text x="14" y="24" fill="#9ad" font-size="14" font-weight="600">drift  (not-under-command)</text>
+    <polyline points="60,120 95,90 120,110 150,80 175,115 205,95" fill="none" stroke="#f2a65a" stroke-width="3"/>
+    <g fill="#f2a65a">
+      <circle cx="60" cy="120" r="3"/><circle cx="95" cy="90" r="3"/>
+      <circle cx="120" cy="110" r="3"/><circle cx="150" cy="80" r="3"/>
+      <circle cx="175" cy="115" r="3"/><circle cx="205" cy="95" r="3"/>
+    </g>
+    <text x="14" y="162" fill="#cfe" font-size="11">near-zero SOG + erratic heading swing → disabled / dragging / distress</text>
+  </g>
+</svg>

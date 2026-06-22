@@ -456,7 +456,37 @@ def analyze(msgs: list[AISMessage], **kw: Any) -> dict[str, Any]:
         proximity_nm=kw.get("dark_rendezvous_nm", 5.0),
     )
     gps = detect_gps_anomalies(msgs)
-    findings = gaps + jumps + loiter + spoof + rdv + dark_rdv + gps
+
+    # track-interaction & behaviour layer (encounters module)
+    from .encounters import (
+        detect_close_quarters,
+        detect_shadowing,
+        detect_convoy,
+        detect_drift,
+    )
+    cq = detect_close_quarters(
+        msgs,
+        cpa_nm=kw.get("cpa_nm", 0.5),
+        tcpa_max_minutes=kw.get("tcpa_max_minutes", 30.0),
+    )
+    shadow = detect_shadowing(
+        msgs,
+        standoff_max_nm=kw.get("standoff_max_nm", 8.0),
+        min_minutes=kw.get("shadow_min_minutes", 90.0),
+    )
+    convoy = detect_convoy(
+        msgs,
+        cluster_nm=kw.get("cluster_nm", 3.0),
+        min_vessels=kw.get("convoy_min_vessels", 3),
+    )
+    drift = detect_drift(
+        msgs,
+        max_sog_kn=kw.get("drift_max_sog_kn", 1.5),
+        min_minutes=kw.get("drift_min_minutes", 60.0),
+    )
+
+    findings = (gaps + jumps + loiter + spoof + rdv + dark_rdv + gps
+                + cq + shadow + convoy + drift)
 
     # optional spatial enrichment: tag every finding with the zones it falls in
     zones = kw.get("zones")
@@ -487,6 +517,10 @@ def analyze(msgs: list[AISMessage], **kw: Any) -> dict[str, Any]:
             "rendezvous": len(rdv),
             "dark_rendezvous": len(dark_rdv),
             "gps_anomaly": len(gps),
+            "close_quarters": len(cq),
+            "shadowing": len(shadow),
+            "convoy": len(convoy),
+            "drift": len(drift),
         },
         "risk_ranking": [{"mmsi": m, "risk_score": s} for m, s in vessels],
         "findings": findings,
