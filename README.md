@@ -110,6 +110,52 @@ maritimeint locate fleet.csv --sanctions sanctions.json --fail-on high
 > `import-ofac` (OFAC-only) remains for back-compat. OFSI/EU publish at drifting / gated
 > endpoints, so those parse a list you download. See [SOURCES.md](SOURCES.md).
 
+### Edge / air-gap data feeds — OFAC SDN that works disconnected
+
+maritimeint bundles a **stdlib-only** data-feed ingestion engine
+(`maritimeint/datafeeds.py` + catalog `data_feeds_2026.json`) so the real OFAC
+sanctions list keeps working on shipboard / disconnected / air-gapped edge gear:
+keyless HTTPS fetch → on-disk cache → **offline** re-serve → sneakernet snapshot.
+
+The `feeds` command exposes the maritime-relevant slice of the shared Cognis feed
+catalog (just the OFAC SDN list for this tool):
+
+```bash
+maritimeint feeds list                              # relevant feeds + cache freshness
+maritimeint feeds update ofac-sdn                   # fetch + cache (connected box)
+maritimeint feeds get ofac-sdn --offline            # re-serve from cache, no network
+```
+
+| Feed id | Authority | Source URL | Format |
+|---|---|---|---|
+| `ofac-sdn` | US Treasury OFAC | `https://www.treasury.gov/ofac/downloads/sdn.csv` | CSV |
+
+**Real enrichment.** The cached SDN list feeds straight into vessel screening —
+designated **vessels** (OFAC records IMO/MMSI in the Remarks field) become the
+`--sanctions` list, and the whole path runs offline:
+
+```bash
+maritimeint import-ofac --from-feed --offline --out ofac.json   # SDN from cache, no network
+maritimeint locate ais.json --sanctions ofac.json               # flag sanctioned vessels
+```
+
+**Air-gap workflow (sneakernet).** Snapshot the cache on a connected box, carry it
+into the enclave, and every screen runs with zero network:
+
+```bash
+# connected box
+maritimeint feeds update ofac-sdn
+maritimeint feeds snapshot-export feeds.tar.gz
+# inside the air gap (after transfer)
+maritimeint feeds snapshot-import feeds.tar.gz
+maritimeint import-ofac --from-feed --offline --out ofac.json
+```
+
+The cache location is `COGNIS_FEEDS_CACHE` (default `~/.cache/cognis-feeds`).
+See [`demos/feeds_offline_demo.sh`](demos/feeds_offline_demo.sh) for the full
+offline run. Tests pin `COGNIS_FEEDS_CACHE` at a committed fixture and use
+`offline=True`, so CI is **green with no network**.
+
 ### Live AIS in, watchlist out
 
 Normalize any AIS provider's export (or pull a live bounding box) into the detectors —

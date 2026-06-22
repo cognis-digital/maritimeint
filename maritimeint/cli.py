@@ -159,7 +159,25 @@ def build_parser() -> argparse.ArgumentParser:
     io = sub.add_parser("import-ofac", help="fetch the live OFAC SDN list -> a --sanctions JSON of designated vessels")
     io.add_argument("--out", default="ofac_sanctions.json", help="output sanctions JSON path")
     io.add_argument("--from-file", default=None, help="parse a local SDN.csv instead of fetching")
+    io.add_argument("--from-feed", action="store_true",
+                    help="source the SDN list from the edge data-feed cache (works air-gapped with --offline)")
+    io.add_argument("--offline", action="store_true",
+                    help="with --from-feed, serve the cached SDN snapshot only (no network)")
     io.add_argument("--url", default=None, help="override the SDN.csv URL")
+
+    # edge / air-gap data-feed ingestion (bundled stdlib datafeeds engine)
+    fd = sub.add_parser("feeds", help="edge/air-gap data feeds (OFAC SDN): list | update | get | snapshot")
+    fdsub = fd.add_subparsers(dest="feeds_cmd", required=True)
+    fdsub.add_parser("list", help="show MARITIMEINT-relevant feeds + cache freshness")
+    fdu = fdsub.add_parser("update", help="fetch + cache a feed (online)")
+    fdu.add_argument("feed", help="feed id (e.g. ofac-sdn)")
+    fdg = fdsub.add_parser("get", help="print a cached/fetched feed")
+    fdg.add_argument("feed", help="feed id (e.g. ofac-sdn)")
+    fdg.add_argument("--offline", action="store_true", help="serve from cache only; never touch the network")
+    fde = fdsub.add_parser("snapshot-export", help="tar the feed cache for sneakernet to an air gap")
+    fde.add_argument("path")
+    fdi = fdsub.add_parser("snapshot-import", help="import a feed-cache snapshot inside an air gap")
+    fdi.add_argument("path")
 
     isn = sub.add_parser("import-sanctions", help="import sanctioned vessels from OFAC / UK OFSI / EU / OpenSanctions (merge with 'all')")
     isn.add_argument("--source", choices=["ofac", "ofsi", "eu", "opensanctions", "all"], default="all")
@@ -212,9 +230,57 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {exc}", file=sys.stderr)
             return 1
         return 0
+    if args.command == "feeds":
+        from . import feeds as feeds_mod
+        if args.feeds_cmd == "list":
+            rows = feeds_mod.list_feeds()
+            if args.format == "json":
+                print(json.dumps(rows, indent=2))
+            else:
+                print("MARITIMEINT edge data feeds (relevant subset of the Cognis catalog):")
+                for f in rows:
+                    age = f["cached_age_hours"]
+                    fresh = "uncached" if age is None else f"{age:.1f}h old"
+                    print(f"  {f['id']:<12} {f.get('domain',''):<8} [{fresh}]  {f['name']}")
+                    print(f"               {f['url']}")
+            return 0
+        if args.feeds_cmd == "update":
+            try:
+                path = feeds_mod.update(args.feed)
+            except (KeyError, ConnectionError) as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 1
+            print(f"updated {args.feed} -> {path}")
+            return 0
+        if args.feeds_cmd == "get":
+            try:
+                data = feeds_mod.get(args.feed, offline=args.offline)
+            except (KeyError, FileNotFoundError, ConnectionError) as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 1
+            print(json.dumps(data, indent=2)[:4000] if isinstance(data, (dict, list)) else data[:4000])
+            return 0
+        if args.feeds_cmd == "snapshot-export":
+            print(f"exported {feeds_mod.snapshot_export(args.path)} feed(s) -> {args.path}")
+            return 0
+        if args.feeds_cmd == "snapshot-import":
+            print(f"imported {feeds_mod.snapshot_import(args.path)} feed(s) from {args.path}")
+            return 0
+        return 1
     if args.command == "import-ofac":
         from . import ofac
         try:
+            if args.from_feed:
+                # source the real SDN list through the edge data-feed cache
+                from . import feeds as feeds_mod
+                entries = feeds_mod.sanctioned_vessels(offline=args.offline)
+                ofac.write_sanctions(entries, args.out)
+                with_imo = sum(1 for e in entries if e["imo"])
+                src = "edge cache (offline)" if args.offline else "edge feed cache"
+                print(f"wrote {len(entries)} sanctioned vessels ({with_imo} with IMO) "
+                      f"from OFAC SDN via {src} to {args.out}")
+                print(f"use it:  maritimeint locate <ais.json> --sanctions {args.out}")
+                return 0
             if args.from_file:
                 with open(args.from_file, encoding="utf-8") as fh:
                     text = fh.read()
