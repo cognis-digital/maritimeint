@@ -44,6 +44,78 @@ maritimeint locate demos/ais_sample.json   # → prioritized grey-fleet watchlis
 >
 > *All four detectors are pure-stdlib, additive layers folded into `analyze` / `locate` — see [the v0.8 walkthrough](#v08) and [`demos/04-dark-sts-zones`](demos/04-dark-sts-zones).*
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ maritimeint --version
+maritimeint 0.9.0
+```
+
+```console
+$ maritimeint --help
+usage: maritimeint [-h] [--version] [--format {table,json}]
+                   {analyze,gaps,jumps,loiter,spoof,rendezvous,dark-rendezvous,gps,close-quarters,shadowing,convoy,drift,encounters,zones,port-calls,locate,vision,export,menu,addins,import-ofac,feeds,import-sanctions,fetch-ais} ...
+
+AIS vessel tracking & sanctions-evasion anomaly detection.
+
+positional arguments:
+  {analyze,gaps,jumps,loiter,spoof,rendezvous,dark-rendezvous,gps,close-quarters,shadowing,convoy,drift,encounters,zones,port-calls,locate,vision,export,menu,addins,import-ofac,feeds,import-sanctions,fetch-ais}
+    analyze             run full detector suite + risk ranking
+    gaps                detect AIS reporting gaps (going dark)
+    jumps               detect implausible position jumps
+    loiter              detect loitering / STS staging
+    spoof               detect spoofing / identity conflicts
+    rendezvous          detect vessel-to-vessel meetings
+    dark-rendezvous     correlate a vessel going dark with another loitering
+                        at the spot
+    gps                 detect GPS spoofing (circling) / jamming hotspots
+    close-quarters      CPA/TCPA: vessel pairs projected to pass dangerously
+                        close
+    shadowing           detect one vessel persistently trailing another at
+                        standoff
+    convoy              detect groups of vessels moving together (co-movement)
+    drift               detect adrift / not-under-command vessels
+                        (safety/distress)
+    encounters          run the full track-interaction suite (CPA + shadow +
+                        convoy + drift)
+    zones               detect zone/geofence entries, exits and dwell
+    port-calls          infer port calls + sequence itineraries (risk-tagged)
+   
+```
+
+> Blocks above are real `maritimeint` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"analyze": [
+  {
+    "id": "123456",
+    "risk_rank": 3,
+    "events": [
+      {
+        "type": "gaps",
+        "start": "2022-01-01T00:00:00Z",
+        "end": "2022-01-02T12:00:00Z"
+      },
+      {
+        "type": "jumps",
+        "start": "2022-01-03T14:00:00Z",
+        "end": "2022-01-04T16:00:00Z"
+      }
+    ]
+  }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Contents
 
 - [Why maritimeint?](#why) · [Features](#features) · [What's new in v0.8](#v08) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)

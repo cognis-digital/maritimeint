@@ -1,0 +1,3 @@
+$ maritimeint --version
+
+maritimeint 0.9.0

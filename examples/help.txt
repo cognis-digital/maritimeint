@@ -1,0 +1,30 @@
+$ maritimeint --help
+
+usage: maritimeint [-h] [--version] [--format {table,json}]
+                   {analyze,gaps,jumps,loiter,spoof,rendezvous,dark-rendezvous,gps,close-quarters,shadowing,convoy,drift,encounters,zones,port-calls,locate,vision,export,menu,addins,import-ofac,feeds,import-sanctions,fetch-ais} ...
+
+AIS vessel tracking & sanctions-evasion anomaly detection.
+
+positional arguments:
+  {analyze,gaps,jumps,loiter,spoof,rendezvous,dark-rendezvous,gps,close-quarters,shadowing,convoy,drift,encounters,zones,port-calls,locate,vision,export,menu,addins,import-ofac,feeds,import-sanctions,fetch-ais}
+    analyze             run full detector suite + risk ranking
+    gaps                detect AIS reporting gaps (going dark)
+    jumps               detect implausible position jumps
+    loiter              detect loitering / STS staging
+    spoof               detect spoofing / identity conflicts
+    rendezvous          detect vessel-to-vessel meetings
+    dark-rendezvous     correlate a vessel going dark with another loitering
+                        at the spot
+    gps                 detect GPS spoofing (circling) / jamming hotspots
+    close-quarters      CPA/TCPA: vessel pairs projected to pass dangerously
+                        close
+    shadowing           detect one vessel persistently trailing another at
+                        standoff
+    convoy              detect groups of vessels moving together (co-movement)
+    drift               detect adrift / not-under-command vessels
+                        (safety/distress)
+    encounters          run the full track-interaction suite (CPA + shadow +
+                        convoy + drift)
+    zones               detect zone/geofence entries, exits and dwell
+    port-calls          infer port calls + sequence itineraries (risk-tagged)
+   
