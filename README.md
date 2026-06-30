@@ -118,7 +118,7 @@ positional arguments:
 
 ## Contents
 
-- [Why maritimeint?](#why) · [Features](#features) · [What's new in v0.8](#v08) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
+- [Why maritimeint?](#why) · [Features](#features) · [What's new in v0.8](#v08) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [Demos](#demos) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
 
 <a name="why"></a>
 ## Why maritimeint?
@@ -391,6 +391,44 @@ flowchart LR
   WL --> GATE{--fail-on<br/>compliance gate}
   WL -. optional .-> AI[vision / reasoning add-ins<br/>via edgemesh / your fleet]
 ```
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
+<a name="demos"></a>
+## Demos
+
+Five runnable, **audience-varied** scenarios in [`demos/`](demos/), each loading the
+same bundled **offline** AIS fixture ([`demos/data/gulf_scenario.json`](demos/data/gulf_scenario.json)
+— 7 vessels, 61 reports) and driving the **real public API** — no live feeds, no
+API keys, no network. Run them all (exits `0`, doubles as a smoke test) or one at a time:
+
+```bash
+PYTHONUTF8=1 python demos/run_all.py            # all five, end to end
+PYTHONUTF8=1 python demos/03_port_security.py   # or just one
+```
+
+| # | Scenario | Audience | Shows |
+|---|----------|----------|-------|
+| 1 | [`01_osint_analyst_sweep`](demos/01_osint_analyst_sweep.py) | OSINT / intel analysts | full detector suite → severity-weighted risk ranking + why the top hull leads |
+| 2 | [`02_sanctions_compliance`](demos/02_sanctions_compliance.py) | sanctions / compliance | `locate()` watchlist: behaviour + MMSI/IMO/name screen → HIGH/MED/LOW tiers |
+| 3 | [`03_port_security`](demos/03_port_security.py) | port security / force protection | zone transits, risk-port itineraries, dark-rendezvous, CPA/TCPA standoff |
+| 4 | [`04_researcher_export`](demos/04_researcher_export.py) | researchers / data teams | one analysis → GeoJSON · KML · STIX 2.1 · CSV, dependency-free + deterministic |
+| 5 | [`05_gps_spoofing_ew`](demos/05_gps_spoofing_ew.py) | EW / GPS-integrity analysts | circling-spoof tracks + jamming hotspots + identity-conflict spoofing |
+
+```mermaid
+flowchart LR
+    fix[(gulf_scenario.json<br/>offline fixture · 7 vessels)] --> load[core.load_messages]
+    load --> sweep[1 · analyze<br/>risk ranking]
+    load --> comp[2 · locate + sanctions<br/>tiered watchlist]
+    load --> sec[3 · zones · ports · encounters<br/>spatial picture]
+    load --> res[4 · intel export<br/>GeoJSON·KML·STIX·CSV]
+    load --> ew[5 · GPS spoof / jamming]
+    classDef f stroke:#6b46c1,stroke-width:2px;
+    class fix f;
+```
+
+See [`docs/DEMOS.md`](docs/DEMOS.md) for the full walkthrough and
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for how the pieces fit together.
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 

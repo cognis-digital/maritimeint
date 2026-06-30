@@ -1,0 +1,26 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"name": "Persian Gulf EEZ", "kind": "eez"},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[48.0, 24.0], [57.0, 24.0], [57.0, 30.5], [48.0, 30.5], [48.0, 24.0]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"name": "Kharg Island Terminal", "kind": "sanctioned_port"},
+      "geometry": {"type": "Point", "coordinates": [50.32, 29.23]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"name": "Strait of Hormuz Approach", "kind": "war_risk"},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[55.8, 26.0], [57.0, 26.0], [57.0, 27.0], [55.8, 27.0], [55.8, 26.0]]]
+      }
+    }
+  ]
+}

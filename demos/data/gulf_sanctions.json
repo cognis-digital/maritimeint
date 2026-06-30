@@ -1,0 +1,18 @@
+[
+  {
+    "name": "GREY DAWN",
+    "imo": "9700101",
+    "mmsi": "572100001",
+    "program": "SAMPLE-EO13846",
+    "source": "SAMPLE list (synthetic — not a real OFAC designation)",
+    "flag": "TZ"
+  },
+  {
+    "name": "LANTERN",
+    "imo": "9700202",
+    "mmsi": "",
+    "program": "SAMPLE-EO13846",
+    "source": "SAMPLE list (synthetic — not a real OFAC designation)",
+    "flag": "PA"
+  }
+]

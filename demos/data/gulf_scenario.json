@@ -1,0 +1,584 @@
+[
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T00:00:00Z",
+  "lat": 25.0,
+  "lon": 57.0,
+  "sog": 11,
+  "cog": 300
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T02:00:00Z",
+  "lat": 25.4,
+  "lon": 56.4,
+  "sog": 11,
+  "cog": 300
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T04:00:00Z",
+  "lat": 25.9,
+  "lon": 55.8,
+  "sog": 11,
+  "cog": 305
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T06:00:00Z",
+  "lat": 26.5,
+  "lon": 55.2,
+  "sog": 10,
+  "cog": 308
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T08:00:00Z",
+  "lat": 27.1,
+  "lon": 54.4,
+  "sog": 10,
+  "cog": 310
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T10:00:00Z",
+  "lat": 28.0,
+  "lon": 53.0,
+  "sog": 0.3,
+  "cog": 0
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T12:00:00Z",
+  "lat": 28.02,
+  "lon": 53.01,
+  "sog": 0.2,
+  "cog": 0
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T14:00:00Z",
+  "lat": 28.01,
+  "lon": 52.99,
+  "sog": 0.3,
+  "cog": 0
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-01T16:00:00Z",
+  "lat": 28.0,
+  "lon": 53.0,
+  "sog": 0.2,
+  "cog": 0
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-02T22:00:00Z",
+  "lat": 29.1,
+  "lon": 50.4,
+  "sog": 6,
+  "cog": 330
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-02T23:00:00Z",
+  "lat": 29.23,
+  "lon": 50.32,
+  "sog": 0.4,
+  "cog": 0
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-03T01:00:00Z",
+  "lat": 29.23,
+  "lon": 50.32,
+  "sog": 0.3,
+  "cog": 0
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-03T03:00:00Z",
+  "lat": 29.23,
+  "lon": 50.32,
+  "sog": 0.4,
+  "cog": 0
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-03T06:00:00Z",
+  "lat": 29.0,
+  "lon": 50.8,
+  "sog": 9,
+  "cog": 120
+ },
+ {
+  "mmsi": "572100001",
+  "name": "GREY DAWN",
+  "imo": "9700101",
+  "timestamp": "2026-02-03T08:00:00Z",
+  "lat": 28.4,
+  "lon": 51.6,
+  "sog": 10,
+  "cog": 120
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-01T12:00:00Z",
+  "lat": 28.5,
+  "lon": 52.2,
+  "sog": 8,
+  "cog": 250
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-01T16:00:00Z",
+  "lat": 28.3,
+  "lon": 52.0,
+  "sog": 7,
+  "cog": 250
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-01T20:00:00Z",
+  "lat": 28.05,
+  "lon": 52.95,
+  "sog": 0.3,
+  "cog": 0
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-02T00:00:00Z",
+  "lat": 28.04,
+  "lon": 52.96,
+  "sog": 0.2,
+  "cog": 0
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-02T04:00:00Z",
+  "lat": 28.06,
+  "lon": 52.94,
+  "sog": 0.3,
+  "cog": 0
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-02T08:00:00Z",
+  "lat": 28.05,
+  "lon": 52.95,
+  "sog": 0.2,
+  "cog": 0
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-02T12:00:00Z",
+  "lat": 28.04,
+  "lon": 52.96,
+  "sog": 0.3,
+  "cog": 0
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-02T16:00:00Z",
+  "lat": 28.4,
+  "lon": 52.2,
+  "sog": 8,
+  "cog": 70
+ },
+ {
+  "mmsi": "636200002",
+  "name": "LANTERN",
+  "imo": "9700202",
+  "timestamp": "2026-02-02T20:00:00Z",
+  "lat": 29.0,
+  "lon": 51.4,
+  "sog": 9,
+  "cog": 70
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T00:00:00Z",
+  "lat": 12.0,
+  "lon": 80.0,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T03:00:00Z",
+  "lat": 12.4,
+  "lon": 79.25,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T06:00:00Z",
+  "lat": 12.8,
+  "lon": 78.5,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T09:00:00Z",
+  "lat": 13.2,
+  "lon": 77.75,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T12:00:00Z",
+  "lat": 13.6,
+  "lon": 77.0,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T15:00:00Z",
+  "lat": 14.0,
+  "lon": 76.25,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T18:00:00Z",
+  "lat": 14.4,
+  "lon": 75.5,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-01T21:00:00Z",
+  "lat": 14.8,
+  "lon": 74.75,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "563300003",
+  "name": "CLEAN TRADER",
+  "imo": "9700303",
+  "timestamp": "2026-02-02T00:00:00Z",
+  "lat": 15.2,
+  "lon": 74.0,
+  "sog": 14,
+  "cog": 285
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T00:00:00Z",
+  "lat": 25.33,
+  "lon": 55.4,
+  "sog": 2,
+  "cog": 0
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T00:30:00Z",
+  "lat": 25.32598,
+  "lon": 55.415,
+  "sog": 2,
+  "cog": 30
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T01:00:00Z",
+  "lat": 25.315,
+  "lon": 55.42598,
+  "sog": 2,
+  "cog": 60
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T01:30:00Z",
+  "lat": 25.3,
+  "lon": 55.43,
+  "sog": 2,
+  "cog": 90
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T02:00:00Z",
+  "lat": 25.285,
+  "lon": 55.42598,
+  "sog": 2,
+  "cog": 120
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T02:30:00Z",
+  "lat": 25.27402,
+  "lon": 55.415,
+  "sog": 2,
+  "cog": 150
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T03:00:00Z",
+  "lat": 25.27,
+  "lon": 55.4,
+  "sog": 2,
+  "cog": 180
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T03:30:00Z",
+  "lat": 25.27402,
+  "lon": 55.385,
+  "sog": 2,
+  "cog": 210
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T04:00:00Z",
+  "lat": 25.285,
+  "lon": 55.37402,
+  "sog": 2,
+  "cog": 240
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T04:30:00Z",
+  "lat": 25.3,
+  "lon": 55.37,
+  "sog": 2,
+  "cog": 270
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T05:00:00Z",
+  "lat": 25.315,
+  "lon": 55.37402,
+  "sog": 2,
+  "cog": 300
+ },
+ {
+  "mmsi": "247400004",
+  "name": "MIRAGE",
+  "timestamp": "2026-02-01T05:30:00Z",
+  "lat": 25.32598,
+  "lon": 55.385,
+  "sog": 2,
+  "cog": 330
+ },
+ {
+  "mmsi": "311500005",
+  "name": "SEA FOX",
+  "timestamp": "2026-02-01T00:00:00Z",
+  "lat": 1.2,
+  "lon": 103.8,
+  "sog": 10,
+  "cog": 90
+ },
+ {
+  "mmsi": "311500005",
+  "name": "SEA FOX",
+  "timestamp": "2026-02-01T01:00:00Z",
+  "lat": 1.3,
+  "lon": 104.0,
+  "sog": 10,
+  "cog": 90
+ },
+ {
+  "mmsi": "311500005",
+  "name": "NIGHT FOX",
+  "timestamp": "2026-02-01T01:12:00Z",
+  "lat": 5.0,
+  "lon": 110.0,
+  "sog": 10,
+  "cog": 90
+ },
+ {
+  "mmsi": "311500005",
+  "name": "NIGHT FOX",
+  "timestamp": "2026-02-01T03:00:00Z",
+  "lat": 5.2,
+  "lon": 110.3,
+  "sog": 10,
+  "cog": 90
+ },
+ {
+  "mmsi": "431600006",
+  "name": "GUARDIAN",
+  "timestamp": "2026-02-01T00:00:00Z",
+  "lat": 26.5,
+  "lon": 56.4,
+  "sog": 8,
+  "cog": 270
+ },
+ {
+  "mmsi": "431600007",
+  "name": "UNKNOWN CONTACT",
+  "timestamp": "2026-02-01T00:00:00Z",
+  "lat": 26.45,
+  "lon": 56.3,
+  "sog": 9,
+  "cog": 30
+ },
+ {
+  "mmsi": "431600006",
+  "name": "GUARDIAN",
+  "timestamp": "2026-02-01T01:00:00Z",
+  "lat": 26.5,
+  "lon": 56.379999999999995,
+  "sog": 8,
+  "cog": 270
+ },
+ {
+  "mmsi": "431600007",
+  "name": "UNKNOWN CONTACT",
+  "timestamp": "2026-02-01T01:00:00Z",
+  "lat": 26.468,
+  "lon": 56.309999999999995,
+  "sog": 9,
+  "cog": 30
+ },
+ {
+  "mmsi": "431600006",
+  "name": "GUARDIAN",
+  "timestamp": "2026-02-01T02:00:00Z",
+  "lat": 26.5,
+  "lon": 56.36,
+  "sog": 8,
+  "cog": 270
+ },
+ {
+  "mmsi": "431600007",
+  "name": "UNKNOWN CONTACT",
+  "timestamp": "2026-02-01T02:00:00Z",
+  "lat": 26.486,
+  "lon": 56.32,
+  "sog": 9,
+  "cog": 30
+ },
+ {
+  "mmsi": "431600006",
+  "name": "GUARDIAN",
+  "timestamp": "2026-02-01T03:00:00Z",
+  "lat": 26.5,
+  "lon": 56.339999999999996,
+  "sog": 8,
+  "cog": 270
+ },
+ {
+  "mmsi": "431600007",
+  "name": "UNKNOWN CONTACT",
+  "timestamp": "2026-02-01T03:00:00Z",
+  "lat": 26.503999999999998,
+  "lon": 56.33,
+  "sog": 9,
+  "cog": 30
+ },
+ {
+  "mmsi": "431600006",
+  "name": "GUARDIAN",
+  "timestamp": "2026-02-01T04:00:00Z",
+  "lat": 26.5,
+  "lon": 56.32,
+  "sog": 8,
+  "cog": 270
+ },
+ {
+  "mmsi": "431600007",
+  "name": "UNKNOWN CONTACT",
+  "timestamp": "2026-02-01T04:00:00Z",
+  "lat": 26.522,
+  "lon": 56.339999999999996,
+  "sog": 9,
+  "cog": 30
+ },
+ {
+  "mmsi": "431600006",
+  "name": "GUARDIAN",
+  "timestamp": "2026-02-01T05:00:00Z",
+  "lat": 26.5,
+  "lon": 56.3,
+  "sog": 8,
+  "cog": 270
+ },
+ {
+  "mmsi": "431600007",
+  "name": "UNKNOWN CONTACT",
+  "timestamp": "2026-02-01T05:00:00Z",
+  "lat": 26.54,
+  "lon": 56.349999999999994,
+  "sog": 9,
+  "cog": 30
+ }
+]
