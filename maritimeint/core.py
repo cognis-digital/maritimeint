@@ -25,11 +25,23 @@ EARTH_RADIUS_NM = 3440.065  # nautical miles
 
 
 def _parse_ts(value: str) -> datetime:
-    """Parse an ISO-8601 timestamp into an aware UTC datetime."""
+    """Parse an ISO-8601 timestamp into an aware UTC datetime.
+
+    Raises a clear :class:`ValueError` (naming the offending value) rather than
+    the bare ``fromisoformat`` message, so a malformed AIS timestamp is
+    actionable instead of cryptic.
+    """
     s = value.strip()
+    if not s:
+        raise ValueError("empty timestamp")
     if s.endswith("Z"):
         s = s[:-1] + "+00:00"
-    dt = datetime.fromisoformat(s)
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError as exc:
+        raise ValueError(
+            f"invalid ISO-8601 timestamp {value!r}: {exc}"
+        ) from exc
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     return dt.astimezone(timezone.utc)
@@ -47,19 +59,39 @@ class AISMessage:
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "AISMessage":
+        if not isinstance(d, dict):
+            raise ValueError(
+                f"AIS record must be an object/dict, got {type(d).__name__}"
+            )
         if "mmsi" not in d:
             raise ValueError("AIS record missing 'mmsi'")
         for key in ("timestamp", "lat", "lon"):
             if key not in d:
                 raise ValueError(f"AIS record for {d.get('mmsi')} missing '{key}'")
+        mmsi = str(d["mmsi"])
+
+        def _num(field: str, val: Any) -> float:
+            try:
+                return float(val)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"AIS record for {mmsi} has non-numeric {field}={val!r}"
+                ) from exc
+
+        lat = _num("lat", d["lat"])
+        lon = _num("lon", d["lon"])
+        if not (-90.0 <= lat <= 90.0):
+            raise ValueError(f"AIS record for {mmsi} has out-of-range lat={lat}")
+        if not (-180.0 <= lon <= 180.0):
+            raise ValueError(f"AIS record for {mmsi} has out-of-range lon={lon}")
         return cls(
-            mmsi=str(d["mmsi"]),
+            mmsi=mmsi,
             timestamp=_parse_ts(str(d["timestamp"])),
-            lat=float(d["lat"]),
-            lon=float(d["lon"]),
+            lat=lat,
+            lon=lon,
             name=str(d.get("name", "")),
-            sog=None if d.get("sog") is None else float(d["sog"]),
-            cog=None if d.get("cog") is None else float(d["cog"]),
+            sog=None if d.get("sog") is None else _num("sog", d["sog"]),
+            cog=None if d.get("cog") is None else _num("cog", d["cog"]),
         )
 
     def as_record(self) -> dict[str, Any]:
@@ -89,7 +121,10 @@ def load_messages(path: str) -> list[AISMessage]:
                 rows.append({k: v for k, v in row.items() if v not in ("", None)})
         return parse_messages(rows)
     with open(path, "r", encoding="utf-8") as fh:
-        raw = json.load(fh)
+        try:
+            raw = json.load(fh)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"{path}: not valid JSON ({exc})") from exc
     if isinstance(raw, dict):
         raw = raw.get("messages", raw.get("records", []))
     if not isinstance(raw, list):

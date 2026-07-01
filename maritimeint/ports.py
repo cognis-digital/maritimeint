@@ -51,16 +51,24 @@ def load_ports(path: str) -> list[dict[str, Any]]:
         raw = json.load(fh)
     if isinstance(raw, dict):
         raw = raw.get("ports", [])
+    if not isinstance(raw, list):
+        raise ValueError("port registry must be a list or {'ports': [...]}")
     ports = []
-    for p in raw:
-        ports.append({
-            "name": str(p["name"]),
-            "country": str(p.get("country", "")),
-            "lat": float(p["lat"]),
-            "lon": float(p["lon"]),
-            "radius_nm": float(p.get("radius_nm", 8.0)),
-            "risk": str(p.get("risk", "normal")),
-        })
+    for i, p in enumerate(raw):
+        try:
+            ports.append({
+                "name": str(p["name"]),
+                "country": str(p.get("country", "")),
+                "lat": float(p["lat"]),
+                "lon": float(p["lon"]),
+                "radius_nm": float(p.get("radius_nm", 8.0)),
+                "risk": str(p.get("risk", "normal")),
+            })
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(
+                f"port registry entry #{i} is malformed "
+                f"(needs name/lat/lon): {exc}"
+            ) from exc
     return ports
 
 

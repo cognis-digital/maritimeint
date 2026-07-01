@@ -19,7 +19,15 @@ from typing import Any
 
 def load_sanctions(path: str) -> list[dict[str, Any]]:
     with open(path, encoding="utf-8") as fh:
-        data = json.load(fh)
+        try:
+            data = json.load(fh)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"{path}: not valid JSON ({exc})") from exc
+    if isinstance(data, dict):
+        # tolerate a wrapped list, e.g. {"entries": [...]} / {"vessels": [...]}
+        for key in ("entries", "vessels", "sanctions", "data"):
+            if isinstance(data.get(key), list):
+                return data[key]
     if not isinstance(data, list):
         raise ValueError("sanctions list must be a JSON array")
     return data

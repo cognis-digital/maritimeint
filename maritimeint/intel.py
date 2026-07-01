@@ -21,6 +21,7 @@ import csv
 import io
 import json
 import uuid
+from datetime import datetime
 from typing import Any
 
 # Deterministic namespace so the same finding always yields the same STIX id.
@@ -54,11 +55,29 @@ def _label(f: dict[str, Any]) -> str:
     return f"{f.get('type', 'finding')}: {who}"
 
 
+def _valid_iso(v: str) -> bool:
+    """True if ``v`` is a parseable ISO-8601 timestamp (accepting a ``Z`` suffix)."""
+    s = v[:-1] + "+00:00" if v.endswith("Z") else v
+    try:
+        datetime.fromisoformat(s)
+        return True
+    except ValueError:
+        return False
+
+
 def _timestamp(f: dict[str, Any]) -> str:
+    """Best available finding timestamp as a STIX-safe ISO-8601 UTC string.
+
+    Only *parseable* ISO-8601 values are accepted; anything else (including
+    caller-supplied junk on arbitrary findings) falls back to ``_FALLBACK_TS`` so
+    every emitted STIX object keeps a spec-valid ``valid_from`` / ``created``.
+    """
     for k in ("timestamp", "dark_from", "start", "from_time", "time"):
         v = f.get(k)
         if isinstance(v, str) and v:
-            return v if v.endswith("Z") else v.rstrip("Z") + "Z" if "T" in v else _FALLBACK_TS
+            cand = v if v.endswith("Z") else (v + "Z" if "T" in v else v)
+            if _valid_iso(cand):
+                return cand
     return _FALLBACK_TS
 
 
