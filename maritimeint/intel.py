@@ -21,6 +21,7 @@ import csv
 import io
 import json
 import uuid
+from datetime import datetime
 from typing import Any
 
 # Deterministic namespace so the same finding always yields the same STIX id.
@@ -68,6 +69,18 @@ def _findings(result: dict[str, Any]) -> list[dict[str, Any]]:
     if isinstance(result, list):
         return list(result)
     raise ValueError("expected an analyze() result with a 'findings' list")
+
+
+def _valid_iso(v: Any) -> bool:
+    """True if ``v`` is a parseable ISO-8601 timestamp (accepting a ``Z`` suffix)."""
+    if not isinstance(v, str) or not v:
+        return False
+    s = v[:-1] + "+00:00" if v.endswith("Z") else v
+    try:
+        datetime.fromisoformat(s)
+        return True
+    except ValueError:
+        return False
 
 
 # --------------------------------------------------------------------------- #
@@ -174,7 +187,95 @@ def to_csv(result: dict[str, Any]) -> str:
     return buf.getvalue()
 
 
-_EXPORTERS = {"geojson": to_geojson, "kml": to_kml, "stix": to_stix, "csv": to_csv}
+# --------------------------------------------------------------------------- #
+# CoT (Cursor-on-Target) — the TAK / ATAK common-operating-picture event format
+# --------------------------------------------------------------------------- #
+# Cursor-on-Target is the XML event schema used by TAK / ATAK and most common
+# operating-picture tools. Emitting findings as CoT lets a maritimeint run drop
+# straight onto a shared COP as track markers. Situational-awareness display only —
+# a CoT event is a position/label, never a task or an engagement order.
+def _cot_type(f: dict[str, Any]) -> str:
+    """Neutral CoT 2525-ish affiliation atom for a finding.
+
+    Always an "unknown" affiliation surface track (``a-u-S``). We never assert a
+    hostile ("a-h-") affiliation — that is an identification / targeting judgement
+    this tool does not make.
+    """
+    return "a-u-S"  # atom, unknown affiliation, Surface
+
+
+def to_cot(result: dict[str, Any]) -> str:
+    """Export findings as Cursor-on-Target ``<event>`` elements under an ``<events>`` root.
+
+    Each geolocated finding becomes one CoT point event at its primary coordinate.
+    Findings with no coordinate are skipped.
+    """
+    parts = ['<?xml version="1.0" encoding="UTF-8"?>', "<events>"]
+    for f in _findings(result):
+        pts = _coords(f)
+        if not pts:
+            continue
+        lat, lon = pts[0]
+        ts = _timestamp(f)
+        uid = f.get("mmsi") or "-".join(f.get("vessels", [])) or _label(f)
+        uid = f"{uid}-{f.get('type', 'finding')}"
+        remarks = _xml_escape(
+            f"{f.get('type', 'finding')} | {_label(f)} | severity={f.get('severity', 'n/a')}"
+        )
+        parts.append(
+            f'<event version="2.0" uid="{_xml_escape(str(uid))}" '
+            f'type="{_cot_type(f)}" how="m-g" '
+            f'time="{ts}" start="{ts}" stale="{ts}">'
+            f'<point lat="{lat}" lon="{lon}" hae="0" ce="9999" le="9999"/>'
+            f'<detail><contact callsign="{_xml_escape(_label(f))}"/>'
+            f'<remarks>{remarks}</remarks></detail></event>'
+        )
+    parts.append("</events>")
+    return "\n".join(parts)
+
+
+# --------------------------------------------------------------------------- #
+# KML timeline — time-stamped placemarks for the Google-Earth time slider
+# --------------------------------------------------------------------------- #
+def to_kml_timeline(result: dict[str, Any]) -> str:
+    """Export findings as time-stamped KML placemarks (a playable timeline).
+
+    Like :func:`to_kml` but every placemark carries a ``<TimeStamp>`` / ``<TimeSpan>``
+    so Google Earth's time slider animates the findings in sequence. Findings with a
+    start+end get a ``TimeSpan``; single-instant findings get a ``TimeStamp``.
+    """
+    parts = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<kml xmlns="http://www.opengis.net/kml/2.2"><Document>',
+             '<name>maritimeint timeline</name>']
+    for f in _findings(result):
+        pts = _coords(f)
+        if not pts:
+            continue
+        name = _xml_escape(_label(f))
+        desc = _xml_escape(f.get("detail", "") or f"severity={f.get('severity', 'n/a')}")
+        begin = f.get("start") or f.get("dark_from") or f.get("enter")
+        end = f.get("end") or f.get("dark_to") or f.get("exit")
+        when = ""
+        if begin and end and _valid_iso(begin) and _valid_iso(end):
+            when = f"<TimeSpan><begin>{begin}</begin><end>{end}</end></TimeSpan>"
+        else:
+            one = f.get("at") or begin or _timestamp(f)
+            if _valid_iso(one):
+                when = f"<TimeStamp><when>{one}</when></TimeStamp>"
+        if len(pts) >= 2:
+            coords = " ".join(f"{lon},{lat},0" for lat, lon in pts)
+            geom = f"<LineString><coordinates>{coords}</coordinates></LineString>"
+        else:
+            lat, lon = pts[0]
+            geom = f"<Point><coordinates>{lon},{lat},0</coordinates></Point>"
+        parts.append(f"<Placemark><name>{name}</name>"
+                     f"<description>{desc}</description>{when}{geom}</Placemark>")
+    parts.append("</Document></kml>")
+    return "\n".join(parts)
+
+
+_EXPORTERS = {"geojson": to_geojson, "kml": to_kml, "stix": to_stix, "csv": to_csv,
+              "cot": to_cot, "kml-timeline": to_kml_timeline}
 
 
 def export(result: dict[str, Any], fmt: str) -> str:

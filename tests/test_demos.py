@@ -24,6 +24,11 @@ SCENARIOS = [
     "03_port_security",
     "04_researcher_export",
     "05_gps_spoofing_ew",
+    "06_fleet_network",
+    "07_flag_hopping",
+    "08_sts_correlation",
+    "09_pattern_of_life",
+    "10_cot_cop_export",
 ]
 
 

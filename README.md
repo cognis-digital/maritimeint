@@ -61,18 +61,17 @@ Real, reproducible output from the tool — runs offline:
 
 ```console
 $ maritimeint --version
-maritimeint 0.9.0
+maritimeint 1.0.0
 ```
 
 ```console
 $ maritimeint --help
 usage: maritimeint [-h] [--version] [--format {table,json}]
-                   {analyze,gaps,jumps,loiter,spoof,rendezvous,dark-rendezvous,gps,close-quarters,shadowing,convoy,drift,encounters,zones,port-calls,locate,vision,export,menu,addins,import-ofac,feeds,import-sanctions,fetch-ais} ...
+                   {analyze,gaps,jumps,loiter,spoof,rendezvous,dark-rendezvous,gps,close-quarters,shadowing,convoy,drift,encounters,network,rings,flag-hopping,identity,fleet,gap-timeline,sts,pattern-of-life,patterns,zones,port-calls,locate,vision,export,menu,addins,import-ofac,feeds,import-sanctions,fetch-ais} ...
 
 AIS vessel tracking & sanctions-evasion anomaly detection.
 
 positional arguments:
-  {analyze,gaps,jumps,loiter,spoof,rendezvous,dark-rendezvous,gps,close-quarters,shadowing,convoy,drift,encounters,zones,port-calls,locate,vision,export,menu,addins,import-ofac,feeds,import-sanctions,fetch-ais}
     analyze             run full detector suite + risk ranking
     gaps                detect AIS reporting gaps (going dark)
     jumps               detect implausible position jumps
@@ -80,20 +79,25 @@ positional arguments:
     spoof               detect spoofing / identity conflicts
     rendezvous          detect vessel-to-vessel meetings
     dark-rendezvous     correlate a vessel going dark with another loitering
-                        at the spot
     gps                 detect GPS spoofing (circling) / jamming hotspots
-    close-quarters      CPA/TCPA: vessel pairs projected to pass dangerously
-                        close
-    shadowing           detect one vessel persistently trailing another at
-                        standoff
+    close-quarters      CPA/TCPA: vessel pairs projected to pass dangerously close
+    shadowing           detect one vessel persistently trailing another at standoff
     convoy              detect groups of vessels moving together (co-movement)
-    drift               detect adrift / not-under-command vessels
-                        (safety/distress)
-    encounters          run the full track-interaction suite (CPA + shadow +
-                        convoy + drift)
+    drift               detect adrift / not-under-command vessels (safety/distress)
+    encounters          run the full track-interaction suite (CPA + shadow + convoy + drift)
+    network             build the vessel contact graph (who interacts with whom)
+    rings               find fleet rings: clusters of repeatedly-interacting vessels
+    flag-hopping        detect a hull broadcasting MMSIs from different flag states
+    identity            detect name-cloning / multi-name identity manipulation
+    fleet               run the full fleet/network suite (rings + flag-hopping + identity)
+    gap-timeline        reconstruct each vessel's going-dark history as a timeline
+    sts                 score ship-to-ship-transfer candidates (loiter+dark+rendezvous fused)
+    pattern-of-life     per-vessel behavioural baseline (where/when/how fast/how often dark)
+    patterns            run the full pattern-of-life suite (gap timeline + STS + POL)
     zones               detect zone/geofence entries, exits and dwell
     port-calls          infer port calls + sequence itineraries (risk-tagged)
-   
+    export              export findings as GeoJSON / KML / KML-timeline / STIX / CSV / CoT
+    locate              prioritized + explained grey-fleet watchlist
 ```
 
 > Blocks above are real `maritimeint` output — reproduce them from a clone.
@@ -154,6 +158,11 @@ AIS vessel tracking & sanctions-evasion anomaly detection — without standing u
 - ✅ **Convoy / co-movement clustering** `v0.9` — groups of vessels moving as one formation (proximity + matched heading & speed across epochs): escort groups & shepherded flotillas single-vessel detection treats as unrelated
 - ✅ **Drift / not-under-command** `v0.9` — near-zero speed with erratic heading swing → disabled / anchor-dragging / possible-distress safety early-warning
 - ✅ **`encounters` mode** `v0.9` — runs all four interaction/behaviour detectors in one pass; also folded into `analyze` so they score the risk ranking and flow through every exporter ([guide](docs/ENCOUNTERS.md))
+- ✅ **Fleet contact network + rings** `v1.0` — build the vessel-interaction graph (nodes = hulls, edges = rendezvous / dark-rendezvous / close-quarters / shadowing / convoy), then collapse it into **fleet rings**: connected clusters of repeatedly-interacting vessels — turns N isolated tracks into the handful of coordinated groups worth one analyst look (`maritimeint network` · `rings` · `fleet`, [guide](docs/FLEET.md))
+- ✅ **Flag-hopping & identity rings** `v1.0` — a single hull (keyed by IMO, else name) broadcasting MMSIs from **different flag states** (decoded from the MMSI's MID country prefix) → re-flagging / ownership obfuscation; plus **name-cloning** (one name on many MMSIs) and multi-name MMSIs (`maritimeint flag-hopping` · `identity`)
+- ✅ **STS-transfer scoring** `v1.0` — fuses loitering + going-dark + (dark-)rendezvous that overlap in time & space into a single **scored, explained** ship-to-ship-transfer candidate with an evidence list a reviewer can accept or dismiss (`maritimeint sts`)
+- ✅ **Going-dark timeline & pattern-of-life** `v1.0` — reconstruct each vessel's AIS-gap history as an ordered timeline (dark events · total dark hours · reappearance drift), and a per-vessel behavioural baseline (active hours · area of operation · speed stats · dark/loiter frequency) — the routine anomalies stand out against (`maritimeint gap-timeline` · `pattern-of-life` · `patterns`)
+- ✅ **CoT & KML-timeline export** `v1.0` — render findings as **Cursor-on-Target** `<event>` markers for the TAK/ATAK common-operating-picture (unknown affiliation only — display, never tasking/targeting) and as **time-stamped KML** that plays back on Google Earth's time slider: `maritimeint export ais.json --to cot` · `--to kml-timeline`
 - ✅ **Dark-rendezvous correlation** `v0.8` — one vessel goes dark while another loiters at the vanish point (the dark-STS signature `rendezvous` misses, because only one party is broadcasting)
 - ✅ **Zone intelligence / geofencing** `v0.8` — GeoJSON or native polygons + great-circle "circle" zones (EEZs · sanctioned ports · exclusion / war-risk); entry/exit/dwell events + **every positional finding tagged with its zone**
 - ✅ **GPS spoofing & jamming** `v0.8` — `circle_spoof` (a track populating the whole compass around a tight centroid) + `gps_jamming` (many distinct MMSIs pinned to one synthetic position)
@@ -300,6 +309,8 @@ maritimeint export ais.json --to geojson -o findings.geojson  # Leaflet/Mapbox/Q
 maritimeint export ais.json --to kml     -o findings.kml      # Google Earth / marine charts
 maritimeint export ais.json --to stix    -o findings.json     # STIX 2.1 bundle for TIPs
 maritimeint export ais.json --to csv     -o findings.csv      # spreadsheets / notebooks
+maritimeint export ais.json --to cot     -o findings.cot.xml  # Cursor-on-Target for TAK/ATAK COP
+maritimeint export ais.json --to kml-timeline -o timeline.kml # Google Earth time-slider playback
 maritimeint export ais.json --to geojson --zones eez.geojson  # tag findings with zones first
 ```
 
@@ -412,7 +423,7 @@ same bundled **offline** AIS fixture ([`demos/data/gulf_scenario.json`](demos/da
 API keys, no network. Run them all (exits `0`, doubles as a smoke test) or one at a time:
 
 ```bash
-PYTHONUTF8=1 python demos/run_all.py            # all five, end to end
+PYTHONUTF8=1 python demos/run_all.py            # all ten, end to end
 PYTHONUTF8=1 python demos/03_port_security.py   # or just one
 ```
 
@@ -423,6 +434,11 @@ PYTHONUTF8=1 python demos/03_port_security.py   # or just one
 | 3 | [`03_port_security`](demos/03_port_security.py) | port security / force protection | zone transits, risk-port itineraries, dark-rendezvous, CPA/TCPA standoff |
 | 4 | [`04_researcher_export`](demos/04_researcher_export.py) | researchers / data teams | one analysis → GeoJSON · KML · STIX 2.1 · CSV, dependency-free + deterministic |
 | 5 | [`05_gps_spoofing_ew`](demos/05_gps_spoofing_ew.py) | EW / GPS-integrity analysts | circling-spoof tracks + jamming hotspots + identity-conflict spoofing |
+| 6 | [`06_fleet_network`](demos/06_fleet_network.py) | intel / link analysts | contact graph → fleet rings: clusters of repeatedly-interacting vessels |
+| 7 | [`07_flag_hopping`](demos/07_flag_hopping.py) | sanctions / compliance | re-flagged hulls (MID-decoded) + name-cloning identity rings |
+| 8 | [`08_sts_correlation`](demos/08_sts_correlation.py) | sanctions / MDA analysts | loiter + going-dark + rendezvous fused into one scored, explained STS candidate |
+| 9 | [`09_pattern_of_life`](demos/09_pattern_of_life.py) | all-source analysts | per-vessel baselines: active hours · area of operation · speed · dark/loiter freq |
+| 10 | [`10_cot_cop_export`](demos/10_cot_cop_export.py) | COP / TAK operators | findings → Cursor-on-Target markers + Google-Earth KML timeline |
 
 ```mermaid
 flowchart LR
