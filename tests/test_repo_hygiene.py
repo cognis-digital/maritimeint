@@ -36,14 +36,15 @@ class TestLabelerV5:
         assert os.path.exists(os.path.join(REPO, ".github", "labeler.yml"))
 
     def test_uses_v5_schema(self):
-        import yaml  # PyYAML ships with most CI; fall back to a text check otherwise
         text = _read(".github", "labeler.yml")
         try:
-            data = yaml.safe_load(text)
-        except Exception:
-            # no yaml available: assert the v5 keyword is present textually
+            import yaml  # PyYAML is optional; fall back to a text check without it
+        except ImportError:
+            # v5 rules use the changed-files / any-glob-to-any-file form
             assert "changed-files" in text
+            assert "any-glob-to-any-file" in text
             return
+        data = yaml.safe_load(text)
         for label, rules in data.items():
             assert isinstance(rules, list), f"{label} must be a list of rules (v5)"
             assert any("changed-files" in r for r in rules if isinstance(r, dict)), \
