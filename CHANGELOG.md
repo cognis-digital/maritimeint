@@ -1,5 +1,50 @@
 # Changelog
 
+## [1.0.0] — 2026-07-01
+
+The "fleet analytics & pattern-of-life" release — three additive, pure-stdlib layers
+on top of the per-vessel and pairwise detectors: **fleet/network analytics**
+(`maritimeint/fleet.py`), **pattern-of-life & multi-signal correlation**
+(`maritimeint/patterns.py`), and two new **exporters** (Cursor-on-Target + KML
+timeline) in `maritimeint/intel.py`. The public API stays stable and additive; every
+new finding flows unchanged through the existing exporters.
+
+Defensive / situational-awareness / OSINT / sanctions-compliance only: link analysis,
+identity flags, scored candidates, and display markers for an analyst. No intercept
+planning, tasking, targeting, or fire-control of any kind; CoT affiliation is always
+"unknown", never hostile. See [`docs/FLEET.md`](docs/FLEET.md).
+
+### Added
+- **Fleet contact network (`contact_network`, `network` command)** — the
+  vessel-interaction graph (nodes = hulls; edges = rendezvous / dark-rendezvous /
+  close-quarters / shadowing / convoy co-membership), each edge carrying interaction
+  type(s), weight and worst severity.
+- **Fleet rings (`fleet_rings`, `rings` command)** — connected components of the
+  contact network with ≥ `min_size` members: clusters of repeatedly-interacting
+  vessels, ranked by size / edges / severity, with a `multi_flag` flag.
+- **Flag-hopping (`flag_hopping`, `flag-hopping` command)** — a hull (keyed by IMO,
+  else name) broadcasting MMSIs from more than one flag state, decoded from the MMSI
+  MID country prefix (offline MID→flag table). Re-flagging / ownership obfuscation.
+- **Identity rings (`identity_rings`, `identity` command)** — `name_clone` (one name
+  on many MMSIs) and `mmsi_multiname` (one MMSI, many names).
+- **`fleet` mode** — rings + flag-hopping + identity rings in one `analyze()`-shaped
+  report with the full contact graph attached.
+- **Going-dark timeline (`gap_timeline`, `gap-timeline` command)** — per-vessel dark
+  windows ordered into a timeline with dark-event count, total/longest dark hours and
+  reappearance drift.
+- **STS-transfer scoring (`sts_transfer_score`, `sts` command)** — fuses overlapping
+  loitering + going-dark + (dark-)rendezvous into a single scored, explained
+  ship-to-ship-transfer candidate with an evidence list.
+- **Pattern-of-life (`pattern_of_life`, `pattern-of-life` command)** — per-vessel
+  behavioural baseline: span, active hours, area of operation, speed stats, dark/loiter
+  frequency. Plus a combined **`patterns` mode**.
+- **CoT exporter (`to_cot`, `export --to cot`)** — Cursor-on-Target `<event>` markers
+  for the TAK/ATAK common-operating-picture; unknown affiliation only (`a-u-S`).
+- **KML-timeline exporter (`to_kml_timeline`, `export --to kml-timeline`)** —
+  time-stamped placemarks (`TimeStamp`/`TimeSpan`) for Google Earth's time slider.
+- **5 new offline demo scenarios** (`06`–`10`) and **84 new tests** (166 → 250);
+  `docs/FLEET.md` guide.
+
 ## [0.9.0] — 2026-06-22
 
 The "track-interaction & behaviour" release — a new analysis layer

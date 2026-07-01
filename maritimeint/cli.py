@@ -36,6 +36,16 @@ def _emit(obj: Any, fmt: str) -> None:
         if obj.get("ai_assessment"):
             print("\nAI assessment (reasoning add-in):\n" + obj["ai_assessment"])
         return
+    # contact network (nodes/edges) — no findings list
+    if isinstance(obj, dict) and obj.get("type") == "contact_network":
+        print(f"MARITIMEINT contact network  nodes={len(obj['nodes'])}  "
+              f"edges={len(obj['edges'])}")
+        for n in obj["nodes"]:
+            print(f"  node {n['mmsi']:<12} {n['name']:<16} {n['flag']:<18} degree={n['degree']}")
+        for e in obj["edges"]:
+            print(f"  edge {' <-> '.join(e['vessels'])}  [{e['severity']:>6}] "
+                  f"{','.join(e['interactions'])} (w={e['weight']})")
+        return
     # table
     if isinstance(obj, dict) and "findings" in obj:
         print(f"MARITIMEINT report  vessels={obj['vessels_tracked']}  "
@@ -143,6 +153,49 @@ def build_parser() -> argparse.ArgumentParser:
     _add_input(en)
     en.add_argument("--zones", default=None, help="zone GeoJSON to tag findings with location")
 
+    nw = sub.add_parser("network",
+                        help="build the vessel contact graph (who interacts with whom)")
+    _add_input(nw)
+
+    rg = sub.add_parser("rings",
+                        help="find fleet rings: clusters of repeatedly-interacting vessels")
+    _add_input(rg)
+    rg.add_argument("--min-size", type=int, default=2, help="minimum vessels in a ring")
+
+    fh = sub.add_parser("flag-hopping",
+                        help="detect a hull broadcasting MMSIs from different flag states")
+    _add_input(fh)
+
+    idr = sub.add_parser("identity",
+                         help="detect name-cloning / multi-name identity manipulation")
+    _add_input(idr)
+
+    fl = sub.add_parser("fleet",
+                        help="run the full fleet/network suite (rings + flag-hopping + identity)")
+    _add_input(fl)
+    fl.add_argument("--zones", default=None, help="zone GeoJSON to tag findings with location")
+    fl.add_argument("--min-size", type=int, default=2)
+
+    gt = sub.add_parser("gap-timeline",
+                        help="reconstruct each vessel's going-dark history as a timeline")
+    _add_input(gt)
+    gt.add_argument("--gap-hours", type=float, default=6.0)
+
+    st = sub.add_parser("sts",
+                        help="score ship-to-ship-transfer candidates (loiter+dark+rendezvous fused)")
+    _add_input(st)
+    st.add_argument("--gap-hours", type=float, default=6.0)
+
+    pol = sub.add_parser("pattern-of-life",
+                         help="per-vessel behavioural baseline (where/when/how fast/how often dark)")
+    _add_input(pol)
+    pol.add_argument("--gap-hours", type=float, default=6.0)
+
+    pt = sub.add_parser("patterns",
+                        help="run the full pattern-of-life suite (gap timeline + STS + POL)")
+    _add_input(pt)
+    pt.add_argument("--zones", default=None, help="zone GeoJSON to tag findings with location")
+
     z = sub.add_parser("zones", help="detect zone/geofence entries, exits and dwell")
     _add_input(z)
     z.add_argument("--zones", required=True, help="zone GeoJSON / native zone list")
@@ -178,10 +231,11 @@ def build_parser() -> argparse.ArgumentParser:
     vi.add_argument("--note", default="", help="optional context for the triage")
 
     ex = sub.add_parser("export",
-                        help="run analysis and export findings as GeoJSON / KML / STIX 2.1 / CSV")
+                        help="run analysis and export findings as GeoJSON / KML / STIX 2.1 / CSV / CoT")
     _add_input(ex)
-    ex.add_argument("--to", choices=["geojson", "kml", "stix", "csv"], default="geojson",
-                    help="export format (default: geojson)")
+    ex.add_argument("--to",
+                    choices=["geojson", "kml", "kml-timeline", "stix", "csv", "cot"],
+                    default="geojson", help="export format (default: geojson)")
     ex.add_argument("--zones", default=None, help="zone GeoJSON to tag findings with location")
     ex.add_argument("-o", "--output", default=None, help="write to file instead of stdout")
 
@@ -454,6 +508,38 @@ def main(argv: list[str] | None = None) -> int:
             from .encounters import analyze_encounters
             zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
             result = analyze_encounters(msgs, zones=zones) if zones else analyze_encounters(msgs)
+        elif args.command == "network":
+            from .fleet import contact_network
+            result = contact_network(msgs)
+        elif args.command == "rings":
+            from .fleet import fleet_rings
+            result = fleet_rings(msgs, min_size=args.min_size)
+        elif args.command == "flag-hopping":
+            from .fleet import flag_hopping
+            static = {m.mmsi: {"name": m.name} for m in msgs}
+            result = flag_hopping(msgs, static=static)
+        elif args.command == "identity":
+            from .fleet import identity_rings
+            result = identity_rings(msgs)
+        elif args.command == "fleet":
+            from .fleet import analyze_fleet
+            zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
+            static = {m.mmsi: {"name": m.name} for m in msgs}
+            result = (analyze_fleet(msgs, static=static, zones=zones, ring_min_size=args.min_size)
+                      if zones else analyze_fleet(msgs, static=static, ring_min_size=args.min_size))
+        elif args.command == "gap-timeline":
+            from .patterns import gap_timeline
+            result = gap_timeline(msgs, gap_hours=args.gap_hours)
+        elif args.command == "sts":
+            from .patterns import sts_transfer_score
+            result = sts_transfer_score(msgs, gap_hours=args.gap_hours)
+        elif args.command == "pattern-of-life":
+            from .patterns import pattern_of_life
+            result = pattern_of_life(msgs, gap_hours=args.gap_hours)
+        elif args.command == "patterns":
+            from .patterns import analyze_patterns
+            zones = _load_zones(args.zones) if getattr(args, "zones", None) else None
+            result = analyze_patterns(msgs, zones=zones) if zones else analyze_patterns(msgs)
         elif args.command == "zones":
             from .zones import detect_zone_transits
             result = detect_zone_transits(msgs, _load_zones(args.zones))

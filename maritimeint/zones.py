@@ -181,7 +181,7 @@ def detect_zone_transits(
 def _positions_of(f: dict[str, Any]) -> list[tuple[float, float]]:
     """Pull every (lat, lon) point a finding references, for zone tagging."""
     pts: list[tuple[float, float]] = []
-    for key in ("from", "to", "center", "position"):
+    for key in ("from", "to", "center", "centroid", "position"):
         v = f.get(key)
         if isinstance(v, (list, tuple)) and len(v) == 2:
             pts.append((float(v[0]), float(v[1])))
