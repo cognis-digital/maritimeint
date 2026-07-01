@@ -85,11 +85,30 @@ def _coerce_zone(d: dict[str, Any]) -> Zone:
     kind = str(d.get("kind", "zone"))
     z = Zone(name=name, kind=kind)
     if d.get("polygon"):
-        z.polygon = [(float(p[0]), float(p[1])) for p in d["polygon"]]
-    if d.get("center") is not None and d.get("radius_nm") is not None:
+        try:
+            z.polygon = [(float(p[0]), float(p[1])) for p in d["polygon"]]
+        except (TypeError, ValueError, IndexError) as exc:
+            raise ValueError(f"zone {name!r} has a malformed polygon: {exc}") from exc
+    has_center = d.get("center") is not None
+    has_radius = d.get("radius_nm") is not None
+    if has_center != has_radius:
+        raise ValueError(
+            f"zone {name!r} needs both 'center' and 'radius_nm' for a circle "
+            "(or use 'polygon')"
+        )
+    if has_center and has_radius:
         c = d["center"]
-        z.center = (float(c[0]), float(c[1]))
-        z.radius_nm = float(d["radius_nm"])
+        try:
+            z.center = (float(c[0]), float(c[1]))
+            z.radius_nm = float(d["radius_nm"])
+        except (TypeError, ValueError, IndexError) as exc:
+            raise ValueError(f"zone {name!r} has a malformed circle: {exc}") from exc
+        if z.radius_nm <= 0:
+            raise ValueError(f"zone {name!r} radius_nm must be positive")
+    if not z.polygon and z.center is None:
+        raise ValueError(
+            f"zone {name!r} has no geometry (needs 'polygon' or 'center'+'radius_nm')"
+        )
     return z
 
 

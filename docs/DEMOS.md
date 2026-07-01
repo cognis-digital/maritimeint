@@ -1,13 +1,13 @@
 # Demos
 
-Five runnable scenarios in [`../demos/`](../demos/), each targeting a different
-audience. Every scenario loads the same bundled, **offline** AIS fixture
-([`demos/data/gulf_scenario.json`](../demos/data/gulf_scenario.json) — 7 vessels,
-61 position reports, a synthetic Persian-Gulf picture) and runs the **real public
-API**: no live feeds, no API keys, no network.
+**Twenty** runnable scenarios in [`../demos/`](../demos/), each targeting a
+different audience or detector. Every scenario loads the same bundled, **offline**
+AIS fixture ([`demos/data/gulf_scenario.json`](../demos/data/gulf_scenario.json) —
+7 vessels, 61 position reports, a synthetic Persian-Gulf picture) and runs the
+**real public API**: no live feeds, no API keys, no network.
 
 ```bash
-PYTHONUTF8=1 python demos/run_all.py            # all five, end to end (exits 0)
+PYTHONUTF8=1 python demos/run_all.py            # all twenty, end to end (exits 0)
 PYTHONUTF8=1 python demos/03_port_security.py   # or just one
 ```
 
@@ -53,6 +53,82 @@ hull tracing a tight circle (the "ships circling an airport" artifact), and many
 vessels snapped to one synthetic position (a jamming hotspot) — plus the
 identity-conflict / static-pin spoofing detector for contrast. Detection over open
 broadcast data, not navigation or targeting.
+
+## 6. Dark ship-to-ship hunt — *correlate going dark with a loiterer*
+**Audience:** sanctions-evasion analysts.
+Correlates an AIS gap in one vessel with another vessel still reporting inside the
+dark window and near the vanish point — the meeting single-vessel detection misses
+because one party stops broadcasting.
+
+## 7. Force protection (CPA / TCPA) — *who closes the perimeter?*
+**Audience:** force protection / collision avoidance.
+Sweeps the closest-point-of-approach danger radius and lists converging pairs with
+CPA distance and time-to-CPA. Separation math only — never an intercept.
+
+## 8. Shadowing — *is someone being trailed?*
+**Audience:** surveillance / interdiction analysts.
+Finds one vessel persistently behind another at a held standoff on a matched course,
+and labels leader vs follower from the track geometry.
+
+## 9. Convoy detection — *grey-fleet flotillas move together*
+**Audience:** grey-fleet / escort-group analysts.
+Clusters vessels that are spatially tight and share heading and speed across multiple
+epochs — one intelligence object instead of N anonymous tracks.
+
+## 10. Safety watch (drift) — *not-under-command / distress*
+**Audience:** SAR / safety desks.
+Flags a vessel creeping at near-zero speed with an erratically swinging heading — a
+humanitarian / safety signal, not an anomaly of intent.
+
+## 11. Geofencing — *zone entries, exits and dwell*
+**Audience:** any analyst who reasons in areas.
+Reports per-vessel transits against the bundled Gulf zones (EEZ, sanctioned ports,
+war-risk boxes) with dwell time and zone-keyed severity.
+
+## 12. Trade-pattern itineraries — *risk-flagged port sequences*
+**Audience:** trade-compliance analysts.
+Sequences inferred port calls into per-vessel itineraries and flags legs that touch a
+sanctioned / high-risk port — the laundering shape.
+
+## 13. GPS spoofing artifacts — *circling tracks & jamming hotspots*
+**Audience:** GPS-integrity analysts.
+The GPS-manipulation fingerprints: a hull tracing a tight full circle, and many
+vessels snapped to one synthetic position in a short window.
+
+## 14. TIP export (STIX 2.1) — *push to a threat-intel platform*
+**Audience:** threat-intel platform operators.
+Renders the analysis as a valid STIX 2.1 bundle of Indicators with deterministic
+uuid5 ids (byte-stable, pipeline-safe to diff).
+
+## 15. Compliance gate — *would this snapshot fail a policy?*
+**Audience:** compliance / CI.
+Shows how a pipeline gates on the watchlist tier (mirrors the CLI `--fail-on`), with
+a HIGH-vs-MEDIUM policy comparison over the fleet snapshot.
+
+## 16. Map export (GeoJSON) — *drop findings on a map*
+**Audience:** GIS / mapping.
+Renders findings as a GeoJSON FeatureCollection (Points and LineStrings) ready for
+Leaflet / Mapbox / QGIS / kepler.gl, and breaks down geometry types.
+
+## 17. Encounters suite — *all four interaction detectors at once*
+**Audience:** anyone wanting the "how do these tracks relate?" view.
+Runs `analyze_encounters` (close-quarters + shadowing + convoy + drift) and returns
+one combined, exporter-ready report.
+
+## 18. Spatial analysis — *every finding tagged with its zones*
+**Audience:** analysts filtering by area.
+Runs the full suite with zones so each positioned finding carries the zones it falls
+in, then groups the tagged findings by zone.
+
+## 19. Loitering as STS staging — *holding station in open water*
+**Audience:** sanctions-evasion analysts.
+Sweeps the dwell threshold to show how loitering (the pre-transfer tell) puts a
+vessel on the watchlist before any rendezvous happens.
+
+## 20. Full pipeline — *raw AIS → analysis → watchlist → four exports*
+**Audience:** everyone; the end-to-end slice.
+Chains load → analyze (with zones) → sanctions screen → prioritized watchlist →
+GeoJSON/KML/STIX/CSV export, validating the exports are well-formed.
 
 ---
 

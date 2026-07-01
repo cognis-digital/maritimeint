@@ -18,6 +18,21 @@ SCENARIOS = [
     "03_port_security",
     "04_researcher_export",
     "05_gps_spoofing_ew",
+    "06_dark_rendezvous_hunt",
+    "07_cpa_tcpa_force_protection",
+    "08_shadowing_surveillance",
+    "09_convoy_greyfleet",
+    "10_drift_distress",
+    "11_zone_geofencing",
+    "12_port_itineraries",
+    "13_gps_spoofing_circles",
+    "14_export_stix_tip",
+    "15_watchlist_gate",
+    "16_geojson_map_export",
+    "17_encounters_suite",
+    "18_zone_enriched_analysis",
+    "19_loitering_sts_staging",
+    "20_full_pipeline",
 ]
 
 
